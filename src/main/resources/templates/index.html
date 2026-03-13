@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iStore — Превосходство в деталях</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #fbfbfd;
+            color: #1d1c1e;
+            overflow-x: hidden;
+        }
+
+        /* Плавный фон */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(0, 113, 227, 0.03) 0%, transparent 40%),
+            radial-gradient(circle at 80% 70%, rgba(255, 45, 85, 0.03) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Навигация */
+        .nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #000, #333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #1d1c1e;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1.8rem;
+        }
+
+        .nav-icons a {
+            color: #1d1c1e;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .nav-icons a:hover {
+            color: #0071e3;
+        }
+
+        /* Hero секция с крутящимися линиями */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero-text {
+            margin-bottom: 3rem;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1d1c1e 0%, #434344 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .hero-text p {
+            font-size: 1.3rem;
+            color: #86868b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Контейнер для анимации */
+        .animation-container {
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Пульсирующая сфера */
+        .pulsing-sphere {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow:
+                    0 0 50px rgba(0, 113, 227, 0.3),
+                    inset -10px -10px 30px rgba(0,0,0,0.1),
+                    inset 10px 10px 30px rgba(255,255,255,0.8);
+            animation: spherePulse 3s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        /* Текст Apple на сфере */
+        .sphere-text {
+            position: absolute;
+            z-index: 3;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0071e3;
+            text-shadow: 0 0 20px rgba(0, 113, 227, 0.5);
+            letter-spacing: 2px;
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        /* Вращающиеся линии */
+        .rotating-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotateClockwise 20s linear infinite;
+        }
+
+        .rotating-lines-2 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotateCounterClockwise 15s linear infinite;
+        }
+
+        /* Линии */
+        .line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 2px;
+            background: linear-gradient(90deg,
+            transparent,
+            rgba(0, 113, 227, 0.2),
+            rgba(0, 113, 227, 0.5),
+            rgba(0, 113, 227, 0.2),
+            transparent);
+            transform-origin: left center;
+            border-radius: 2px;
+        }
+
+        .line-1 { transform: rotate(0deg) translateX(-150px); }
+        .line-2 { transform: rotate(45deg) translateX(-150px); }
+        .line-3 { transform: rotate(90deg) translateX(-150px); }
+        .line-4 { transform: rotate(135deg) translateX(-150px); }
+        .line-5 { transform: rotate(180deg) translateX(-150px); }
+        .line-6 { transform: rotate(225deg) translateX(-150px); }
+        .line-7 { transform: rotate(270deg) translateX(-150px); }
+        .line-8 { transform: rotate(315deg) translateX(-150px); }
+
+        /* Дополнительные линии для второго слоя */
+        .line-9 { transform: rotate(22.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+        .line-10 { transform: rotate(67.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+        .line-11 { transform: rotate(112.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+        .line-12 { transform: rotate(157.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+        .line-13 { transform: rotate(202.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+        .line-14 { transform: rotate(247.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+        .line-15 { transform: rotate(292.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+        .line-16 { transform: rotate(337.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
+
+        /* Кольца */
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(0, 113, 227, 0.1);
+            border-radius: 50%;
+        }
+
+        .ring-1 {
+            width: 250px;
+            height: 250px;
+            animation: ringPulse 4s ease-in-out infinite;
+        }
+
+        .ring-2 {
+            width: 320px;
+            height: 320px;
+            border-width: 1px;
+            border-color: rgba(0, 113, 227, 0.05);
+            animation: ringPulse 4s ease-in-out infinite reverse;
+        }
+
+        /* Анимации */
+        @keyframes spherePulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 50px rgba(0, 113, 227, 0.3);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 0 80px rgba(0, 113, 227, 0.5);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 50px rgba(0, 113, 227, 0.3);
+            }
+        }
+
+        @keyframes textGlow {
+            0% {
+                text-shadow: 0 0 20px rgba(0, 113, 227, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                text-shadow: 0 0 40px rgba(0, 113, 227, 0.8);
+                transform: scale(1.1);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(0, 113, 227, 0.5);
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateClockwise {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes rotateCounterClockwise {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(-360deg);
+            }
+        }
+
+        @keyframes ringPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+        }
+
+        /* Преимущества */
+        .features {
+            background: white;
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .features-grid {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4rem;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature p {
+            color: #86868b;
+            line-height: 1.6;
+        }
+
+        /* Категории */
+        .categories {
+            max-width: 1280px;
+            margin: 6rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-subtitle {
+            color: #0071e3;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #1d1c1e;
+            margin-bottom: 1rem;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1.5rem;
+        }
+
+        .category-card {
+            background: white;
+            padding: 1.8rem 1rem;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 113, 227, 0.1);
+            border-color: rgba(0, 113, 227, 0.2);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .category-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-text h1 {
+                font-size: 2.8rem;
+            }
+
+            .category-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .animation-container {
+                width: 300px;
+                height: 300px;
+            }
+
+            .pulsing-sphere {
+                width: 140px;
+                height: 140px;
+            }
+
+            .sphere-text {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="gradient-bg"></div>
+
+<!-- Навигация -->
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/" class="logo">iStore</a>
+        <div class="nav-links">
+            <a href="/category/iphone">iPhone</a>
+            <a href="/category/mac">Mac</a>
+            <a href="/category/ipad">iPad</a>
+            <a href="/category/airpods">AirPods</a>
+            <a href="/category/watch">Watch</a>
+            <a href="/category/accessories">Аксессуары</a>
+        </div>
+        <div class="nav-icons">
+            <a href="/search">🔍</a>
+            <a href="/cart">🛒</a>
+            <a href="/profile">👤</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero секция с крутящимися линиями -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1>Технологии будущего</h1>
+            <p>Инновации, которые меняют мир вокруг нас</p>
+        </div>
+
+        <!-- Анимация с крутящимися линиями и пульсирующей сферой -->
+        <div class="animation-container">
+            <!-- Внешние кольца -->
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+
+            <!-- Первый слой вращающихся линий (по часовой) -->
+            <div class="rotating-lines">
+                <div class="line line-1"></div>
+                <div class="line line-2"></div>
+                <div class="line line-3"></div>
+                <div class="line line-4"></div>
+                <div class="line line-5"></div>
+                <div class="line line-6"></div>
+                <div class="line line-7"></div>
+                <div class="line line-8"></div>
+            </div>
+
+            <!-- Второй слой вращающихся линий (против часовой) -->
+            <div class="rotating-lines-2">
+                <div class="line line-9"></div>
+                <div class="line line-10"></div>
+                <div class="line line-11"></div>
+                <div class="line line-12"></div>
+                <div class="line line-13"></div>
+                <div class="line line-14"></div>
+                <div class="line line-15"></div>
+                <div class="line line-16"></div>
+            </div>
+
+            <!-- Пульсирующая сфера с текстом Apple -->
+            <div class="pulsing-sphere"></div>
+            <div class="sphere-text">APPLE</div>
+        </div>
+    </div>
+</section>
+
+<!-- Категории -->
+<section class="categories">
+    <div class="section-header">
+        <span class="section-subtitle">Категории</span>
+        <h2 class="section-title">Исследуйте мир Apple</h2>
+    </div>
+
+    <div class="category-grid">
+        <a href="/category/iphone" class="category-card">
+            <div class="category-icon">📱</div>
+            <h3>iPhone</h3>
+        </a>
+        <a href="/category/mac" class="category-card">
+            <div class="category-icon">💻</div>
+            <h3>Mac</h3>
+        </a>
+        <a href="/category/ipad" class="category-card">
+            <div class="category-icon">📱</div>
+            <h3>iPad</h3>
+        </a>
+        <a href="/category/airpods" class="category-card">
+            <div class="category-icon">🎧</div>
+            <h3>AirPods</h3>
+        </a>
+        <a href="/category/watch" class="category-card">
+            <div class="category-icon">⌚</div>
+            <h3>Watch</h3>
+        </a>
+        <a href="/category/accessories" class="category-card">
+            <div class="category-icon">🔌</div>
+            <h3>Аксессуары</h3>
+        </a>
+    </div>
+</section>
+
+<!-- Преимущества -->
+<section class="features">
+    <div class="features-grid">
+        <div class="feature">
+            <div class="feature-icon">🚚</div>
+            <h3>Бесплатная доставка</h3>
+            <p>При заказе от 50 000 ₽</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🛡️</div>
+            <h3>2 года гарантии</h3>
+            <p>Официальная гарантия</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">💳</div>
+            <h3>Рассрочка 0-0-6</h3>
+            <p>Без переплат</p>
+        </div>
+    </div>
+</section>
+
+<!-- Футер -->
+<footer class="footer" style="background: #1d1c1e; color: #86868b; padding: 4rem 2rem; margin-top: 4rem;">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); gap: 4rem;">
+        <div>
+            <h3 style="color: white; font-size: 1.5rem;">iStore</h3>
+            <p style="margin: 1rem 0;">Превосходство в деталях.</p>
+        </div>
+        <div>
+            <h4 style="color: white; margin-bottom: 1.5rem;">Категории</h4>
+            <ul style="list-style: none;">
+                <li><a href="#" style="color: #86868b; text-decoration: none;">iPhone</a></li>
+                <li><a href="#" style="color: #86868b; text-decoration: none;">Mac</a></li>
+                <li><a href="#" style="color: #86868b; text-decoration: none;">iPad</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 style="color: white; margin-bottom: 1.5rem;">Покупателям</h4>
+            <ul style="list-style: none;">
+                <li><a href="#" style="color: #86868b; text-decoration: none;">Доставка</a></li>
+                <li><a href="#" style="color: #86868b; text-decoration: none;">Оплата</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 style="color: white; margin-bottom: 1.5rem;">Контакты</h4>
+            <ul style="list-style: none;">
+                <li><a href="tel:+74951234567" style="color: #86868b; text-decoration: none;">+7 (495) 123-45-67</a></li>
+                <li><a href="mailto:info@istore.ru" style="color: #86868b; text-decoration: none;">info@istore.ru</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
