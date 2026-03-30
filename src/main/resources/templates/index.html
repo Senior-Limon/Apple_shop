@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,6 @@
             overflow-x: hidden;
         }
 
-        /* Плавный фон */
         .gradient-bg {
             position: fixed;
             top: 0;
@@ -31,7 +30,6 @@
             pointer-events: none;
         }
 
-        /* Навигация */
         .nav {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
@@ -94,7 +92,6 @@
             color: #0071e3;
         }
 
-        /* Hero секция с крутящимися линиями */
         .hero {
             min-height: 100vh;
             display: flex;
@@ -133,7 +130,6 @@
             margin: 0 auto;
         }
 
-        /* Контейнер для анимации */
         .animation-container {
             width: 400px;
             height: 400px;
@@ -144,22 +140,17 @@
             justify-content: center;
         }
 
-        /* Пульсирующая сфера */
         .pulsing-sphere {
             width: 180px;
             height: 180px;
             background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0);
             border-radius: 50%;
             position: absolute;
-            box-shadow:
-                    0 0 50px rgba(0, 113, 227, 0.3),
-                    inset -10px -10px 30px rgba(0,0,0,0.1),
-                    inset 10px 10px 30px rgba(255,255,255,0.8);
+            box-shadow: 0 0 50px rgba(0, 113, 227, 0.3), inset -10px -10px 30px rgba(0,0,0,0.1), inset 10px 10px 30px rgba(255,255,255,0.8);
             animation: spherePulse 3s ease-in-out infinite;
             z-index: 2;
         }
 
-        /* Текст Apple на сфере */
         .sphere-text {
             position: absolute;
             z-index: 3;
@@ -171,7 +162,6 @@
             animation: textGlow 3s ease-in-out infinite;
         }
 
-        /* Вращающиеся линии */
         .rotating-lines {
             position: absolute;
             width: 100%;
@@ -186,19 +176,13 @@
             animation: rotateCounterClockwise 15s linear infinite;
         }
 
-        /* Линии */
         .line {
             position: absolute;
             top: 50%;
             left: 50%;
             width: 300px;
             height: 2px;
-            background: linear-gradient(90deg,
-            transparent,
-            rgba(0, 113, 227, 0.2),
-            rgba(0, 113, 227, 0.5),
-            rgba(0, 113, 227, 0.2),
-            transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 113, 227, 0.2), rgba(0, 113, 227, 0.5), rgba(0, 113, 227, 0.2), transparent);
             transform-origin: left center;
             border-radius: 2px;
         }
@@ -211,8 +195,6 @@
         .line-6 { transform: rotate(225deg) translateX(-150px); }
         .line-7 { transform: rotate(270deg) translateX(-150px); }
         .line-8 { transform: rotate(315deg) translateX(-150px); }
-
-        /* Дополнительные линии для второго слоя */
         .line-9 { transform: rotate(22.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
         .line-10 { transform: rotate(67.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
         .line-11 { transform: rotate(112.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
@@ -222,7 +204,6 @@
         .line-15 { transform: rotate(292.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
         .line-16 { transform: rotate(337.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
 
-        /* Кольца */
         .ring {
             position: absolute;
             top: 50%;
@@ -232,85 +213,29 @@
             border-radius: 50%;
         }
 
-        .ring-1 {
-            width: 250px;
-            height: 250px;
-            animation: ringPulse 4s ease-in-out infinite;
-        }
+        .ring-1 { width: 250px; height: 250px; animation: ringPulse 4s ease-in-out infinite; }
+        .ring-2 { width: 320px; height: 320px; border-width: 1px; border-color: rgba(0, 113, 227, 0.05); animation: ringPulse 4s ease-in-out infinite reverse; }
 
-        .ring-2 {
-            width: 320px;
-            height: 320px;
-            border-width: 1px;
-            border-color: rgba(0, 113, 227, 0.05);
-            animation: ringPulse 4s ease-in-out infinite reverse;
-        }
-
-        /* Анимации */
         @keyframes spherePulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 50px rgba(0, 113, 227, 0.3);
-            }
-            50% {
-                transform: scale(1.2);
-                box-shadow: 0 0 80px rgba(0, 113, 227, 0.5);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 50px rgba(0, 113, 227, 0.3);
-            }
+            0% { transform: scale(1); box-shadow: 0 0 50px rgba(0, 113, 227, 0.3); }
+            50% { transform: scale(1.2); box-shadow: 0 0 80px rgba(0, 113, 227, 0.5); }
+            100% { transform: scale(1); box-shadow: 0 0 50px rgba(0, 113, 227, 0.3); }
         }
 
         @keyframes textGlow {
-            0% {
-                text-shadow: 0 0 20px rgba(0, 113, 227, 0.5);
-                transform: scale(1);
-            }
-            50% {
-                text-shadow: 0 0 40px rgba(0, 113, 227, 0.8);
-                transform: scale(1.1);
-            }
-            100% {
-                text-shadow: 0 0 20px rgba(0, 113, 227, 0.5);
-                transform: scale(1);
-            }
+            0% { text-shadow: 0 0 20px rgba(0, 113, 227, 0.5); transform: scale(1); }
+            50% { text-shadow: 0 0 40px rgba(0, 113, 227, 0.8); transform: scale(1.1); }
+            100% { text-shadow: 0 0 20px rgba(0, 113, 227, 0.5); transform: scale(1); }
         }
 
-        @keyframes rotateClockwise {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes rotateCounterClockwise {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(-360deg);
-            }
-        }
-
+        @keyframes rotateClockwise { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateCounterClockwise { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         @keyframes ringPulse {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
-            }
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
         }
 
-        /* Преимущества */
         .features {
             background: white;
             padding: 6rem 2rem;
@@ -326,132 +251,83 @@
             text-align: center;
         }
 
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-        }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 1.5rem; }
+        .feature h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
+        .feature p { color: #86868b; line-height: 1.6; }
 
-        .feature h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .feature p {
-            color: #86868b;
-            line-height: 1.6;
-        }
-
-        /* Категории */
         .categories {
             max-width: 1280px;
             margin: 6rem auto;
             padding: 0 2rem;
         }
 
-        .section-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-subtitle {
-            color: #0071e3;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .section-title {
-            font-size: 3rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            color: #1d1c1e;
-            margin-bottom: 1rem;
-        }
+        .section-header { text-align: center; margin-bottom: 3rem; }
+        .section-subtitle { color: #0071e3; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 1rem; display: block; }
+        .section-title { font-size: 3rem; font-weight: 600; letter-spacing: -0.02em; color: #1d1c1e; margin-bottom: 1rem; }
 
         .category-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 1.5rem;
+            display: grid !important;
+            grid-template-columns: repeat(5, 1fr) !important;
+            gap: 1.5rem !important;
+            margin-top: 2rem !important;
         }
 
         .category-card {
-            background: white;
-            padding: 1.8rem 1rem;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            text-decoration: none;
-            color: inherit;
-            display: block;
+            display: block !important;
+            background: white !important;
+            padding: 1.8rem 1rem !important;
+            border-radius: 24px !important;
+            text-align: center !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            border: 1px solid rgba(0, 0, 0, 0.03) !important;
+            text-decoration: none !important;
+            color: inherit !important;
         }
 
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 113, 227, 0.1);
-            border-color: rgba(0, 113, 227, 0.2);
+        .category-card:hover { transform: translateY(-5px) !important; box-shadow: 0 20px 40px rgba(0, 113, 227, 0.1) !important; border-color: rgba(0, 113, 227, 0.2) !important; }
+        .category-icon { font-size: 2.5rem !important; margin-bottom: 0.8rem !important; }
+        .category-card h3 { font-size: 1.2rem !important; font-weight: 600 !important; }
+
+        .footer {
+            background: #1d1c1e;
+            color: #86868b;
+            padding: 4rem 2rem 2rem;
+            margin-top: 4rem;
         }
 
-        .category-icon {
-            font-size: 2.5rem;
-            margin-bottom: 0.8rem;
-        }
+        .footer-container { max-width: 1280px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 4rem; }
+        .footer-col p { margin: 1.5rem 0; line-height: 1.6; }
+        .footer-col h4 { color: white; font-size: 1.1rem; margin-bottom: 1.5rem; font-weight: 600; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul li a { color: #86868b; text-decoration: none; transition: color 0.3s; font-size: 0.95rem; }
+        .footer-col ul li a:hover { color: white; }
+        .footer-bottom { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.9rem; }
 
-        .category-card h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        /* Адаптивность */
         @media (max-width: 1024px) {
-            .category-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .category-grid { grid-template-columns: repeat(3, 1fr) !important; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero-text h1 {
-                font-size: 2.8rem;
-            }
-
-            .category-grid,
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .animation-container {
-                width: 300px;
-                height: 300px;
-            }
-
-            .pulsing-sphere {
-                width: 140px;
-                height: 140px;
-            }
-
-            .sphere-text {
-                font-size: 1.5rem;
-            }
+            .nav-links { display: none; }
+            .hero-text h1 { font-size: 2.8rem; }
+            .category-grid { grid-template-columns: 1fr !important; }
+            .features-grid { grid-template-columns: 1fr; }
+            .animation-container { width: 300px; height: 300px; }
+            .pulsing-sphere { width: 140px; height: 140px; }
+            .sphere-text { font-size: 1.5rem; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 <div class="gradient-bg"></div>
 
-<!-- Навигация -->
 <nav class="nav">
     <div class="nav-container">
         <a href="/" class="logo">iStore</a>
@@ -460,18 +336,16 @@
             <a href="/category/mac">Mac</a>
             <a href="/category/ipad">iPad</a>
             <a href="/category/airpods">AirPods</a>
-            <a href="/category/watch">Watch</a>
             <a href="/category/accessories">Аксессуары</a>
         </div>
         <div class="nav-icons">
             <a href="/search">🔍</a>
             <a href="/cart">🛒</a>
-            <a href="/profile">👤</a>
+            <a href="/logout">🚪</a>
         </div>
     </div>
 </nav>
 
-<!-- Hero секция с крутящимися линиями -->
 <section class="hero">
     <div class="hero-content">
         <div class="hero-text">
@@ -479,13 +353,9 @@
             <p>Инновации, которые меняют мир вокруг нас</p>
         </div>
 
-        <!-- Анимация с крутящимися линиями и пульсирующей сферой -->
         <div class="animation-container">
-            <!-- Внешние кольца -->
             <div class="ring ring-1"></div>
             <div class="ring ring-2"></div>
-
-            <!-- Первый слой вращающихся линий (по часовой) -->
             <div class="rotating-lines">
                 <div class="line line-1"></div>
                 <div class="line line-2"></div>
@@ -496,8 +366,6 @@
                 <div class="line line-7"></div>
                 <div class="line line-8"></div>
             </div>
-
-            <!-- Второй слой вращающихся линий (против часовой) -->
             <div class="rotating-lines-2">
                 <div class="line line-9"></div>
                 <div class="line line-10"></div>
@@ -508,15 +376,12 @@
                 <div class="line line-15"></div>
                 <div class="line line-16"></div>
             </div>
-
-            <!-- Пульсирующая сфера с текстом Apple -->
             <div class="pulsing-sphere"></div>
             <div class="sphere-text">APPLE</div>
         </div>
     </div>
 </section>
 
-<!-- Категории -->
 <section class="categories">
     <div class="section-header">
         <span class="section-subtitle">Категории</span>
@@ -524,40 +389,29 @@
     </div>
 
     <div class="category-grid">
-        <a href="/category/iphone" class="category-card">
-            <div class="category-icon">📱</div>
-            <h3>iPhone</h3>
-        </a>
-        <a href="/category/mac" class="category-card">
-            <div class="category-icon">💻</div>
-            <h3>Mac</h3>
-        </a>
-        <a href="/category/ipad" class="category-card">
-            <div class="category-icon">📱</div>
-            <h3>iPad</h3>
-        </a>
-        <a href="/category/airpods" class="category-card">
-            <div class="category-icon">🎧</div>
-            <h3>AirPods</h3>
-        </a>
-        <a href="/category/watch" class="category-card">
-            <div class="category-icon">⌚</div>
-            <h3>Watch</h3>
-        </a>
-        <a href="/category/accessories" class="category-card">
-            <div class="category-icon">🔌</div>
-            <h3>Аксессуары</h3>
+        <a th:each="category : ${categories}"
+           th:href="@{'/category/' + ${category.name.toLowerCase()}}"
+           class="category-card">
+            <div class="category-icon" th:switch="${category.name}">
+                <span th:case="'iPhone'">📱</span>
+                <span th:case="'Mac'">💻</span>
+                <span th:case="'MacBook'">💻</span>
+                <span th:case="'iPad'">📱</span>
+                <span th:case="'AirPods'">🎧</span>
+                <span th:case="'Аксессуары'">🔌</span>
+                <span th:case="*">📦</span>
+            </div>
+            <h3 th:text="${category.name}">iPhone</h3>
         </a>
     </div>
 </section>
 
-<!-- Преимущества -->
 <section class="features">
     <div class="features-grid">
         <div class="feature">
             <div class="feature-icon">🚚</div>
             <h3>Бесплатная доставка</h3>
-            <p>При заказе от 50 000 ₽</p>
+            <p>При заказе от 1 000 BYN</p>
         </div>
         <div class="feature">
             <div class="feature-icon">🛡️</div>
@@ -572,34 +426,32 @@
     </div>
 </section>
 
-<!-- Футер -->
-<footer class="footer" style="background: #1d1c1e; color: #86868b; padding: 4rem 2rem; margin-top: 4rem;">
-    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); gap: 4rem;">
-        <div>
-            <h3 style="color: white; font-size: 1.5rem;">iStore</h3>
-            <p style="margin: 1rem 0;">Превосходство в деталях.</p>
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3 style="color: white; font-size: 1.5rem;">iStore</h3>
+                <p>Превосходство в деталях. Официальный дилер Apple.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Категории</h4>
+                <ul>
+                    <li th:each="category : ${categories}">
+                        <a th:href="@{'/category/' + ${category.name.toLowerCase()}}" th:text="${category.name}">iPhone</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Контакты</h4>
+                <ul>
+                    <li><a href="tel:+375291234567">+375 (29) 123-45-67</a></li>
+                    <li><a href="mailto:info@istore.by">info@istore.by</a></li>
+                    <li>Минск, пр. Независимости, 10</li>
+                </ul>
+            </div>
         </div>
-        <div>
-            <h4 style="color: white; margin-bottom: 1.5rem;">Категории</h4>
-            <ul style="list-style: none;">
-                <li><a href="#" style="color: #86868b; text-decoration: none;">iPhone</a></li>
-                <li><a href="#" style="color: #86868b; text-decoration: none;">Mac</a></li>
-                <li><a href="#" style="color: #86868b; text-decoration: none;">iPad</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 style="color: white; margin-bottom: 1.5rem;">Покупателям</h4>
-            <ul style="list-style: none;">
-                <li><a href="#" style="color: #86868b; text-decoration: none;">Доставка</a></li>
-                <li><a href="#" style="color: #86868b; text-decoration: none;">Оплата</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 style="color: white; margin-bottom: 1.5rem;">Контакты</h4>
-            <ul style="list-style: none;">
-                <li><a href="tel:+74951234567" style="color: #86868b; text-decoration: none;">+7 (495) 123-45-67</a></li>
-                <li><a href="mailto:info@istore.ru" style="color: #86868b; text-decoration: none;">info@istore.ru</a></li>
-            </ul>
+        <div class="footer-bottom">
+            <p>© 2026 iStore. Все права защищены.</p>
         </div>
     </div>
 </footer>

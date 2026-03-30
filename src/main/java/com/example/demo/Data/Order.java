@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,12 +47,20 @@ public class Order {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<OrderItem> items = new ArrayList<>();
 
-    // Хелпер метод
+    // Хелпер метод для добавления товара в заказ
     public void addItem(OrderItem item) {
         items.add(item);
         item.setOrder(this);
+    }
+
+    // Хелпер метод для удаления товара из заказа
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
     }
 }

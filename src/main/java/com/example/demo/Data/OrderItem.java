@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 
 @Entity
@@ -19,6 +21,8 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Order order;
 
     @ManyToOne
@@ -48,7 +52,7 @@ public class OrderItem {
         this.chip = product.getChip();
     }
 
-    // Свой метод
+    // Метод для подсчета суммы по позиции
     public BigDecimal getSubtotal() {
         return priceAtPurchase.multiply(BigDecimal.valueOf(quantity));
     }
