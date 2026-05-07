@@ -25,6 +25,10 @@ public class User {
     private String phone;
     private String role = "USER";
 
+    public User(Long userId) {
+        this.id = userId;
+    }
+
     // Свой метод (Lombok не трогает)
     public boolean isAdmin() {
         return "ADMIN".equals(this.role);

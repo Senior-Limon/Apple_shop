@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import java.util.List;
 
 @Entity
 @Table(name = "categories")
@@ -20,6 +19,8 @@ public class Category {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
+    @Column(unique = true)                // ← НОВОЕ ПОЛЕ
+    private String slug;                  // ← НОВОЕ ПОЛЕ
+
+    // геттеры и сеттеры (Lombok @Data уже генерирует)
 }

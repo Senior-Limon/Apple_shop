@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' | iStore'">Товар | iStore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+        }
+        body { background-color: #fbfbfd; color: #1d1c1e; }
+        .gradient-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 30%, rgba(0, 113, 227, 0.03) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(255, 45, 85, 0.03) 0%, transparent 40%); z-index: -1; pointer-events: none; }
+        .nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo { font-size: 1.8rem; font-weight: 600; background: linear-gradient(135deg, #000, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: #1d1c1e; text-decoration: none; font-size: 0.95rem; font-weight: 500; opacity: 0.8; transition: opacity 0.3s; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-icons { display: flex; gap: 1.8rem; }
+        .nav-icons a { color: #1d1c1e; text-decoration: none; font-size: 1.2rem; transition: color 0.3s; }
+        .nav-icons a:hover { color: #0071e3; }
+        .breadcrumb { max-width: 1280px; margin: 1.5rem auto 0; padding: 0 2rem; font-size: 0.9rem; color: #86868b; }
+        .breadcrumb a { color: #0071e3; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .product-detail { max-width: 1280px; margin: 2rem auto 0; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .product-gallery { background: white; border-radius: 32px; padding: 2rem; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
+        .product-gallery img { max-width: 100%; max-height: 400px; object-fit: contain; }
+        .product-info { background: white; border-radius: 32px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
+        .product-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .product-specs { font-size: 0.9rem; color: #86868b; margin-bottom: 1rem; border-bottom: 1px solid #f0f0f0; padding-bottom: 1rem; }
+        .product-price { font-size: 2rem; font-weight: 700; color: #0071e3; margin: 1rem 0; }
+        .btn { display: inline-block; width: 100%; padding: 0.9rem; border-radius: 40px; font-weight: 600; text-align: center; cursor: pointer; border: none; transition: background 0.2s; text-decoration: none; font-size: 1rem; }
+        .btn-primary { background: #0071e3; color: white; }
+        .btn-primary:hover { background: #005bb5; }
+        .product-description-section { max-width: 1280px; margin: 2rem auto; padding: 0 2rem; }
+        .description-card { background: white; border-radius: 32px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
+        .description-card h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
+        .description-card p { line-height: 1.6; color: #333; white-space: pre-line; }
+        .features-grid { max-width: 1280px; margin: 2rem auto; padding: 0 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        .feature-card { background: white; border-radius: 20px; padding: 1.2rem; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); transition: transform 0.2s; }
+        .feature-card:hover { transform: translateY(-3px); }
+        .feature-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .feature-title { font-weight: 600; margin-bottom: 0.5rem; }
+        .feature-text { font-size: 0.85rem; color: #666; }
+        .flash-message { max-width: 1280px; margin: 1rem auto 0; padding: 0.8rem 2rem; border-radius: 40px; text-align: center; }
+        .flash-success { background: #10b981; color: white; }
+        .flash-error { background: #ef4444; color: white; }
+        @media (max-width: 900px) { .product-detail { grid-template-columns: 1fr; } .features-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .features-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="gradient-bg"></div>
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/" class="logo">iStore</a>
+        <div class="nav-links">
+            <a href="/category/iphone">iPhone</a>
+            <a href="/category/mac">Mac</a>
+            <a href="/category/ipad">iPad</a>
+            <a href="/category/airpods">AirPods</a>
+            <a href="/category/accessories">Аксессуары</a>
+        </div>
+        <div class="nav-icons">
+            <a href="/search">🔍</a>
+            <a href="/cart">🛒</a>
+            <a href="/logout">🚪</a>
+        </div>
+    </div>
+</nav>
+
+<div class="breadcrumb" th:if="${product != null}">
+    <a href="/">Главная</a> /
+    <a th:href="@{'/category/' + ${product.category.slug}}" th:text="${product.category.name}">Категория</a> /
+    <span th:text="${product.name}">Товар</span>
+</div>
+
+<div th:if="${message}" class="flash-message flash-success" th:text="${message}"></div>
+<div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
+
+<div class="product-detail" th:if="${product != null}">
+    <div class="product-gallery">
+        <img th:if="${product.mainImage != null}" th:src="@{${product.mainImage.imageUrl}}" alt="product image">
+        <img th:if="${product.mainImage == null}" src="/images/no-image.png" alt="product image">
+    </div>
+    <div class="product-info">
+        <h1 class="product-title" th:text="${product.name}">iPhone 14</h1>
+        <div class="product-specs">
+            <span th:if="${product.memory}" th:text="'Объём памяти: ' + ${product.memory}"></span>
+            <span th:if="${product.color}" th:text="' | Цвет: ' + ${product.color}"></span>
+            <span th:if="${product.chip}" th:text="' | Чип: ' + ${product.chip}"></span>
+        </div>
+        <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 1, 2, 'COMMA')} + ' BYN'">1700 BYN</div>
+
+        <!-- Форма без redirectUrl -->
+        <form method="post" th:action="@{/cart/add}">
+            <input type="hidden" name="productId" th:value="${product.id}">
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="btn btn-primary">В корзину</button>
+        </form>
+    </div>
+</div>
+
+<div class="product-description-section" th:if="${product != null and product.description != null}">
+    <div class="description-card">
+        <h2>Описание</h2>
+        <p th:text="${product.description}">Здесь будет подробное описание товара. Оригинальный iPhone, новый, в заводской упаковке. Гарантия 36 месяцев.</p>
+    </div>
+</div>
+
+<div class="features-grid">
+    <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <div class="feature-title">Оригинальная продукция</div>
+        <div class="feature-text">Продаем только оригинальную продукцию Apple</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <div class="feature-title">Качество и гарантия</div>
+        <div class="feature-text">Гарантия на всю технику 36 месяцев</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🎁</div>
+        <div class="feature-title">Подарки</div>
+        <div class="feature-text">Всем клиентам дарим Чехол и Стекло на iPhone</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🚚</div>
+        <div class="feature-title">Бесплатная доставка</div>
+        <div class="feature-text">При заказе от 1000 byn</div>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        const flash = document.querySelector('.flash-message');
+        if (flash) flash.style.display = 'none';
+    }, 3000);
+</script>
+</body>
+</html>

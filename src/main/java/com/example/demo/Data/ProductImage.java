@@ -25,4 +25,9 @@ public class ProductImage {
 
     @Column(name = "is_main")
     private Boolean isMain = false;
+
+
+    public boolean isMain() { return isMain; }
+    public void setMain(boolean main) { this.isMain = main; }
+
 }

@@ -18,6 +18,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     // Конкретный товар в корзине
     Optional<CartItem> findByCartIdAndProductId(Long cartId, Long productId);
 
+
     // Удалить все из корзины
     void deleteByCartId(Long cartId);
 
@@ -33,4 +34,12 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             "JOIN FETCH ci.product " +
             "WHERE ci.cart.user.id = :userId")
     List<CartItem> findUserCartWithProducts(@Param("userId") Long userId);
+
+    // НОВЫЙ МЕТОД – загружает корзину пользователя с товарами и их изображениями
+    @Query("SELECT ci FROM CartItem ci " +
+            "JOIN FETCH ci.product p " +
+            "JOIN FETCH p.images " +
+            "WHERE ci.cart.user.id = :userId")
+    List<CartItem> findUserCartWithProductsAndImages(@Param("userId") Long userId);
+
 }

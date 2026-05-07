@@ -4,36 +4,48 @@ import com.example.demo.Data.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
-@Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // Все товары из определенной категории
-    List<Product> findByCategoryId(Long categoryId);
+    // Без сортировки (но с изображениями) – оставляем для совместимости
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.images " +
+            "WHERE p.category.id = :categoryId")
+    List<Product> findByCategoryIdWithImages(@Param("categoryId") Long categoryId);
 
-    // Все активные товары
-    List<Product> findByIsActiveTrue();
+    // Сортировка по цене (возрастание)
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.images " +
+            "WHERE p.category.id = :categoryId " +
+            "ORDER BY p.price ASC")
+    List<Product> findByCategoryIdOrderByPriceAsc(@Param("categoryId") Long categoryId);
 
-    // Товары дешевле указанной цены
-    List<Product> findByPriceLessThan(BigDecimal price);
+    // Сортировка по цене (убывание)
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.images " +
+            "WHERE p.category.id = :categoryId " +
+            "ORDER BY p.price DESC")
+    List<Product> findByCategoryIdOrderByPriceDesc(@Param("categoryId") Long categoryId);
 
-    // Товары с остатком меньше указанного (для уведомлений)
-    List<Product> findByStockQuantityLessThan(int quantity);
+    // Сортировка по названию (А-Я)
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.images " +
+            "WHERE p.category.id = :categoryId " +
+            "ORDER BY p.name ASC")
+    List<Product> findByCategoryIdOrderByNameAsc(@Param("categoryId") Long categoryId);
 
-    // Поиск по названию (частичное совпадение, без учета регистра)
-    List<Product> findByNameContainingIgnoreCase(String keyword);
+    // Сортировка по названию (Я-А)
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.images " +
+            "WHERE p.category.id = :categoryId " +
+            "ORDER BY p.name DESC")
+    List<Product> findByCategoryIdOrderByNameDesc(@Param("categoryId") Long categoryId);
 
-    // Сложный запрос: товары с фильтрацией (JPQL)
-    @Query("SELECT p FROM Product p WHERE " +
-            "(:categoryId IS NULL OR p.category.id = :categoryId) AND " +
-            "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
-            "(:maxPrice IS NULL OR p.price <= :maxPrice)")
-    List<Product> findWithFilters(
-            @Param("categoryId") Long categoryId,
-            @Param("minPrice") BigDecimal minPrice,
-            @Param("maxPrice") BigDecimal maxPrice
-    );
+    // Для страницы товара (оставляем без изменений)
+    @Query("SELECT p FROM Product p " +
+            "LEFT JOIN FETCH p.images " +
+            "WHERE p.id = :id")
+    Optional<Product> findByIdWithImages(@Param("id") Long id);
 }

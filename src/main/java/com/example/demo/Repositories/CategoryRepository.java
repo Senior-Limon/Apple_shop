@@ -16,6 +16,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     // Проверка существования категории
     boolean existsByName(String name);
 
+    Optional<Category> findByNameIgnoreCase(String name);
+
+    Optional<Category> findBySlug(String slug);
+
     // Все категории, отсортированные по имени
     List<Category> findAllByOrderByNameAsc();
 }

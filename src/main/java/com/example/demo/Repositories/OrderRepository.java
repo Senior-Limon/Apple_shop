@@ -15,7 +15,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Заказы по статусу (для админки)
     List<Order> findByStatusOrderByCreatedAtDesc(String status);
 
-    // Сортировка как ты хотел: NEW → SHIPPED → DELIVERED → CANCELLED
+    // Сортировка NEW → SHIPPED → DELIVERED → CANCELLED
     @Query("SELECT o FROM Order o ORDER BY " +
             "CASE o.status " +
             "WHEN 'NEW' THEN 1 " +

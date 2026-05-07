@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${categoryName} + ' | iStore'"></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+        }
+        body { background-color: #fbfbfd; color: #1d1c1e; }
+
+        /* Хлебные крошки */
+        .breadcrumb {
+            max-width: 1280px;
+            margin: 1.5rem auto 0;
+            padding: 0 2rem;
+            font-size: 0.9rem;
+            color: #86868b;
+        }
+        .breadcrumb a { color: #0071e3; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* Заголовок категории */
+        .category-header {
+            text-align: center;
+            margin: 2rem 0 1rem;
+        }
+        .category-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1d1c1e, #434344);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        /* Панель сортировки */
+        .toolbar {
+            max-width: 1280px;
+            margin: 1rem auto 2rem;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1rem;
+        }
+        .sort-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .sort-select {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sort-select:hover {
+            border-color: #0071e3;
+        }
+        .reset-btn {
+            background: none;
+            border: none;
+            color: #0071e3;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+            opacity: 0.7;
+        }
+        .reset-btn:hover {
+            opacity: 1;
+        }
+
+        /* Сетка товаров */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .product-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 113, 227, 0.12);
+            border-color: rgba(0, 113, 227, 0.2);
+        }
+
+        .product-image {
+            height: 220px;
+            background: #f5f5f7;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .product-image img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-image img {
+            transform: scale(1.02);
+        }
+
+        .product-title-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .product-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .product-title-link:hover .product-title {
+            color: #0071e3;
+        }
+
+        .product-specs {
+            font-size: 0.85rem;
+            color: #86868b;
+            margin-bottom: 0.5rem;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0071e3;
+            margin: 0.5rem 0;
+        }
+        .btn-add {
+            width: 100%;
+            background: #0071e3;
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: auto;
+        }
+        .btn-add:hover {
+            background: #005bb5;
+            transform: scale(1.01);
+        }
+        .btn-add:active {
+            transform: scale(0.98);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 4rem;
+            color: #86868b;
+            font-size: 1.2rem;
+        }
+
+        /* Flash-сообщения */
+        .flash-message {
+            max-width: 1280px;
+            margin: 1rem auto 0;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .flash-success { background: #10b981; color: white; }
+        .flash-error { background: #ef4444; color: white; }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+                padding: 0 1rem;
+            }
+            .category-header h1 { font-size: 2rem; }
+            .toolbar {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <a href="/">Главная</a> / <span th:text="${categoryName}"></span>
+</div>
+
+<div th:if="${message}" class="flash-message flash-success" th:text="${message}"></div>
+<div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
+
+<div class="category-header">
+    <h1 th:text="${categoryName}">Категория</h1>
+    <h3>Click on the name of product</h3>
+</div>
+
+<!-- Панель сортировки -->
+<div class="toolbar">
+    <span class="sort-label">Сортировать:</span>
+    <select id="sortSelect" class="sort-select">
+        <option value="default">По умолчанию</option>
+        <option value="price_asc">Цена: по возрастанию</option>
+        <option value="price_desc">Цена: по убыванию</option>
+        <option value="name_asc">Название: А-Я</option>
+        <option value="name_desc">Название: Я-А</option>
+    </select>
+    <button id="resetSort" class="reset-btn">Сбросить</button>
+</div>
+
+<div class="product-grid" th:if="${products != null and !products.isEmpty()}">
+    <div th:each="p : ${products}" class="product-card">
+        <div class="product-image">
+            <img th:if="${p.mainImage != null}" th:src="@{${p.mainImage.imageUrl}}" alt="Product image">
+            <img th:if="${p.mainImage == null}" src="/images/no-image.png" alt="No image">
+        </div>
+        <a th:href="@{/product/{id}(id=${p.id})}" class="product-title-link">
+            <div class="product-title" th:text="${p.name}">iPhone 15 Pro</div>
+        </a>
+        <div class="product-specs">
+            <span th:if="${p.memory}" th:text="${p.memory}"></span>
+            <span th:if="${p.color}" th:text="', ' + ${p.color}"></span>
+            <span th:if="${p.chip}" th:text="', ' + ${p.chip}"></span>
+        </div>
+        <div class="product-price" th:text="${#numbers.formatDecimal(p.price, 1, 2, 'COMMA')} + ' BYN'"></div>
+
+        <form method="post" th:action="@{/cart/add}">
+            <input type="hidden" name="productId" th:value="${p.id}">
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="btn-add">В корзину</button>
+        </form>
+    </div>
+</div>
+
+<div th:if="${products == null or products.isEmpty()}" class="empty-message">
+    🛍️ Товаров в этой категории пока нет.<br>
+    Загляните позже!
+</div>
+
+<script>
+    // Сортировка через URL-параметр
+    const sortSelect = document.getElementById('sortSelect');
+    const resetBtn = document.getElementById('resetSort');
+
+    function applySort() {
+        const value = sortSelect.value;
+        const url = new URL(window.location.href);
+        if (value === 'default') {
+            url.searchParams.delete('sort');
+        } else {
+            url.searchParams.set('sort', value);
+        }
+        window.location.href = url.toString();
+    }
+
+    sortSelect.addEventListener('change', applySort);
+    resetBtn.addEventListener('click', () => {
+        window.location.href = window.location.pathname;
+    });
+
+    // Установка выбранного значения из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSort = urlParams.get('sort');
+    if (currentSort) {
+        sortSelect.value = currentSort;
+    }
+
+    // Автоматическое скрытие flash-сообщений
+    setTimeout(() => {
+        const flash = document.querySelector('.flash-message');
+        if (flash) flash.style.display = 'none';
+    }, 3000);
+</script>
+</body>
+</html>
