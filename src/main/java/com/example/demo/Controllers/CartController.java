@@ -26,22 +26,27 @@ public class CartController {
 
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new RuntimeException("Пользователь не авторизован");
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+            throw new RuntimeException("Please login to view cart");
         }
-        return userService.getUserByLogin(auth.getName());
+        return userService.getUserByPhone(auth.getName());
     }
 
     @GetMapping
-    public String viewCart(Model model) {
-        User user = getCurrentUser();
-        List<CartItem> items = cartService.getCartItems(user.getId());
-        double total = items.stream()
-                .mapToDouble(i -> i.getProduct().getPrice().doubleValue() * i.getQuantity())
-                .sum();
-        model.addAttribute("cartItems", items);
-        model.addAttribute("total", total);
-        model.addAttribute("itemsCount", items.size());
+    public String showCart(Model model) {
+        try {
+            User user = getCurrentUser();
+            List<CartItem> items = cartService.getCartItems(user.getId());
+            double total = items.stream()
+                    .mapToDouble(i -> i.getProduct().getPrice().doubleValue() * i.getQuantity())
+                    .sum();
+            model.addAttribute("cartItems", items);
+            model.addAttribute("total", total);
+            model.addAttribute("itemsCount", items.size());
+        } catch (RuntimeException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "redirect:/login";
+        }
         return "cart";
     }
 
@@ -50,10 +55,11 @@ public class CartController {
                             @RequestParam(defaultValue = "1") int quantity,
                             RedirectAttributes redirectAttributes) {
         try {
-            cartService.addToCart(getCurrentUser().getId(), productId, quantity);
-            redirectAttributes.addFlashAttribute("message", "Товар добавлен в корзину");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            User user = getCurrentUser();
+            cartService.addToCart(user.getId(), productId, quantity);
+            redirectAttributes.addFlashAttribute("successMessage", "Product added to cart");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/cart";
     }
@@ -63,11 +69,12 @@ public class CartController {
                                  @RequestParam int quantity,
                                  RedirectAttributes redirectAttributes) {
         try {
+            User user = getCurrentUser();
             if (quantity < 1) quantity = 1;
-            cartService.updateQuantity(getCurrentUser().getId(), cartItemId, quantity);
-            redirectAttributes.addFlashAttribute("message", "Количество обновлено");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            cartService.updateQuantity(user.getId(), cartItemId, quantity);
+            redirectAttributes.addFlashAttribute("successMessage", "Quantity updated");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/cart";
     }
@@ -76,10 +83,11 @@ public class CartController {
     public String removeItem(@RequestParam Long cartItemId,
                              RedirectAttributes redirectAttributes) {
         try {
-            cartService.removeItem(getCurrentUser().getId(), cartItemId);
-            redirectAttributes.addFlashAttribute("message", "Товар удалён");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            User user = getCurrentUser();
+            cartService.removeItem(user.getId(), cartItemId);
+            redirectAttributes.addFlashAttribute("successMessage", "Item removed from cart");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/cart";
     }

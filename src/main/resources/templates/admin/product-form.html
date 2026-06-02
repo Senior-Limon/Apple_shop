@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:if="${product.id}">Редактировать товар</title>
+    <title th:unless="${product.id}">Новый товар</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; }
+        body { background: #f5f5f7; }
+        .nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo { font-size: 1.5rem; font-weight: 600; text-decoration: none; color: #0071e3; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: #1d1c1e; text-decoration: none; opacity: 0.7; }
+        .nav-links a.active { opacity: 1; color: #0071e3; }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { background: none; border: none; color: #ff3b30; cursor: pointer; }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 2rem; }
+        .form-card { background: white; border-radius: 24px; padding: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .form-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #333; }
+        input, select, textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #0071e3; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn { padding: 0.6rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-size: 1rem; }
+        .btn-primary { background: #0071e3; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; }
+        .form-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+        .flash-error { background: #fee2e2; color: #ef4444; padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+
+        /* Галерея */
+        .images-section { margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem; }
+        .images-title { font-weight: 600; margin-bottom: 1rem; color: #333; }
+        .current-images { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .image-item { position: relative; width: 120px; border: 2px solid #ddd; border-radius: 12px; padding: 0.5rem; background: #fafafa; text-align: center; }
+        .image-item.main { border-color: #0071e3; background: #e6f7ff; }
+        .current-image { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; }
+        .main-badge { position: absolute; top: -8px; left: -8px; background: #0071e3; color: white; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+        .image-actions { display: flex; gap: 0.3rem; margin-top: 0.5rem; }
+        .set-main-btn { background: #0071e3; color: white; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; flex: 1; }
+        .delete-image-btn { background: #ff3b30; color: white; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; flex: 1; }
+        .add-images { margin-top: 1rem; }
+        .image-preview { position: relative; width: 100px; display: inline-block; margin: 5px; }
+        .image-preview img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
+        .remove-preview { position: absolute; top: -8px; right: -8px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
+        .loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; z-index: 9999; }
+        .preview-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/admin" class="logo">iStore Admin</a>
+        <div class="nav-links">
+            <a href="/admin">Дашборд</a>
+            <a href="/admin/products" class="active">Товары</a>
+            <a href="/admin/orders">Заказы</a>
+            <a href="/admin/categories">Категории</a>
+        </div>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}">admin</span>
+            <form action="/logout" method="post">
+                <button type="submit" class="logout-btn">Выйти</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-card">
+        <h1 class="form-title" th:text="${product.id} ? 'Редактировать товар' : 'Новый товар'"></h1>
+
+        <div th:if="${error}" class="flash-error" th:text="${error}"></div>
+
+        <form id="productForm" th:action="@{/admin/products/save}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" th:value="${product.id}">
+            <input type="hidden" name="mainImageId" id="mainImageId" value="">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Название товара</label>
+                    <input type="text" name="name" th:value="${product.name}" required>
+                </div>
+                <div class="form-group">
+                    <label>Цена (руб.)</label>
+                    <input type="number" step="0.01" name="price" th:value="${product.price}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Категория</label>
+                    <select name="categoryId">
+                        <option value="">Без категории</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${product.category != null and product.category.id == cat.id}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Количество на складе</label>
+                    <input type="number" name="stockQuantity" th:value="${product.stockQuantity}" value="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Цвет</label>
+                    <input type="text" name="color" th:value="${product.color}" placeholder="Space Black, Silver...">
+                </div>
+                <div class="form-group">
+                    <label>Память</label>
+                    <input type="text" name="memory" th:value="${product.memory}" placeholder="128GB, 256GB...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Процессор / Чип</label>
+                <input type="text" name="chip" th:value="${product.chip}" placeholder="Apple M3, A17 Pro...">
+            </div>
+
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea name="description" rows="4" th:text="${product.description}"></textarea>
+            </div>
+
+            <!-- Галерея текущих изображений -->
+            <div th:if="${product.images != null and !product.images.isEmpty()}" class="images-section">
+                <div class="images-title">Текущие изображения</div>
+                <div class="current-images" id="currentImages">
+                    <div th:each="img : ${product.images}" class="image-item" th:classappend="${img.main} ? 'main'" th:data-id="${img.id}">
+                        <span th:if="${img.main}" class="main-badge">Главное</span>
+                        <img th:src="${img.imageUrl}" class="current-image">
+                        <div class="image-actions">
+                            <button type="button" class="set-main-btn" th:data-id="${img.id}" th:disabled="${img.main}" onclick="setMainImage(this)">Главное</button>
+                            <button type="button" class="delete-image-btn" th:data-id="${img.id}" onclick="deleteImage(this)">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Добавление новых изображений -->
+            <div class="images-section">
+                <div class="images-title">Добавить новые изображения</div>
+                <input type="file" id="imageInput" multiple accept="image/jpeg,image/png,image/jpg,image/webp">
+                <div id="previewContainer" class="preview-container"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a href="/admin/products" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="loading" id="loading">Сохранение...</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const previewContainer = document.getElementById('previewContainer');
+    let compressedFiles = [];
+
+    // Сжатие изображения
+    async function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxSize = 1200;
+                    if (width > height && width > maxSize) {
+                        height = (height * maxSize) / width;
+                        width = maxSize;
+                    } else if (height > maxSize) {
+                        width = (width * maxSize) / height;
+                        height = maxSize;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
+                        resolve(compressedFile);
+                    }, 'image/jpeg', 0.7);
+                };
+                img.onerror = reject;
+            };
+            reader.onerror = reject;
+        });
+    }
+
+    // Установка главного изображения
+    function setMainImage(button) {
+        const imageId = button.getAttribute('data-id');
+        if (!imageId) return;
+
+        fetch('/admin/products/image/set-main', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'imageId=' + imageId
+        })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'ok') {
+                    location.reload();
+                } else {
+                    alert('Ошибка: ' + result);
+                }
+            })
+            .catch(error => alert('Ошибка: ' + error));
+    }
+
+    // Удаление изображения
+    function deleteImage(button) {
+        const imageId = button.getAttribute('data-id');
+        if (!confirm('Удалить это изображение?')) return;
+
+        fetch('/admin/products/image/delete/' + imageId, { method: 'POST' })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'ok') {
+                    button.closest('.image-item').remove();
+                    alert('Изображение удалено');
+                } else {
+                    alert('Ошибка: ' + result);
+                }
+            })
+            .catch(error => alert('Ошибка: ' + error));
+    }
+
+    // Обработка выбора новых файлов
+    imageInput.addEventListener('change', async function(e) {
+        const files = Array.from(e.target.files);
+        previewContainer.innerHTML = '';
+        compressedFiles = [];
+
+        for (const file of files) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`Файл ${file.name} слишком большой. Максимум 10MB.`);
+                continue;
+            }
+
+            try {
+                const compressed = await compressImage(file);
+                compressedFiles.push(compressed);
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'image-preview';
+                    div.innerHTML = `
+                        <img src="${e.target.result}">
+                        <button type="button" class="remove-preview" onclick="this.parentElement.remove()">×</button>
+                    `;
+                    previewContainer.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Ошибка сжатия:', error);
+            }
+        }
+    });
+
+    // Отправка формы с AJAX
+    document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const loading = document.getElementById('loading');
+        loading.style.display = 'block';
+
+        const formData = new FormData();
+
+        formData.append('id', document.querySelector('input[name="id"]').value || '');
+        formData.append('name', document.querySelector('input[name="name"]').value);
+        formData.append('price', document.querySelector('input[name="price"]').value);
+        formData.append('categoryId', document.querySelector('select[name="categoryId"]').value || '');
+        formData.append('stockQuantity', document.querySelector('input[name="stockQuantity"]').value);
+        formData.append('color', document.querySelector('input[name="color"]').value || '');
+        formData.append('memory', document.querySelector('input[name="memory"]').value || '');
+        formData.append('chip', document.querySelector('input[name="chip"]').value || '');
+        formData.append('description', document.querySelector('textarea[name="description"]').value || '');
+
+        for (let i = 0; i < compressedFiles.length; i++) {
+            formData.append('images', compressedFiles[i]);
+        }
+
+        try {
+            const response = await fetch('/admin/products/save', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                const text = await response.text();
+                if (text.includes('error')) {
+                    alert('Ошибка сохранения');
+                } else {
+                    window.location.href = '/admin/products';
+                }
+            }
+        } catch (error) {
+            alert('Ошибка: ' + error.message);
+        } finally {
+            loading.style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>

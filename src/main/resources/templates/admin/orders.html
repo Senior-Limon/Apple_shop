@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заказы | Админ-панель</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; }
+        body { background: #f5f5f7; }
+        .nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo { font-size: 1.5rem; font-weight: 600; text-decoration: none; color: #0071e3; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: #1d1c1e; text-decoration: none; font-size: 0.9rem; font-weight: 500; opacity: 0.7; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-links a.active { opacity: 1; color: #0071e3; }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { background: none; border: none; color: #ff3b30; cursor: pointer; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .page-title { font-size: 2rem; font-weight: 700; }
+        .report-btn { background: #10b981; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; }
+        .filters { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .filter-btn { padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; font-size: 0.85rem; background: white; color: #666; border: 1px solid #ddd; }
+        .filter-btn.active { background: #0071e3; color: white; border-color: #0071e3; }
+        .orders-section { background: white; border-radius: 24px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
+
+        .orders-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+        .order-card { background: white; border: 2px solid #e5e7eb; border-radius: 20px; padding: 1.5rem; transition: box-shadow 0.2s; }
+        .order-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: #0071e3; }
+
+        .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0; margin-bottom: 1rem; }
+        .order-number { font-weight: 700; font-size: 1.2rem; color: #0071e3; background: #e6f7ff; padding: 0.3rem 1rem; border-radius: 20px; }
+        .order-date { color: #666; font-size: 0.85rem; background: #f8f8fc; padding: 0.3rem 1rem; border-radius: 20px; }
+        .order-status { padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .status-NEW { background: #fff0f0; color: #ff3b30; border: 1px solid #ff3b30; }
+        .status-SHIPPED { background: #fff4e6; color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-DELIVERED { background: #e6f7e6; color: #10b981; border: 1px solid #10b981; }
+        .status-CANCELLED { background: #f0f0f0; color: #666; border: 1px solid #999; }
+
+        .order-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1rem; }
+        @media (max-width: 900px) { .order-body { grid-template-columns: 1fr; gap: 0.8rem; } }
+
+        .order-info-block { background: #f8f8fc; padding: 1rem; border-radius: 12px; border-left: 4px solid #0071e3; }
+        .order-info-block h4 { font-size: 0.7rem; color: #666; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .order-info-block p { font-size: 0.95rem; font-weight: 500; color: #1d1c1e; word-break: break-word; }
+        .order-address { background: #f0f7ff; border-left: 4px solid #10b981; }
+        .order-address p { font-family: monospace; font-size: 0.85rem; }
+
+        .order-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f0f0f0; }
+        .order-total { font-weight: 700; font-size: 1.3rem; color: #0071e3; background: #e6f7ff; padding: 0.3rem 1rem; border-radius: 20px; }
+
+        .status-form { display: flex; gap: 0.5rem; align-items: center; background: #f8f8fc; padding: 0.3rem 0.8rem; border-radius: 30px; }
+        .status-label { font-size: 0.8rem; font-weight: 600; color: #666; }
+        .status-select { padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid #ddd; font-size: 0.8rem; background: white; cursor: pointer; }
+        .update-status-btn { background: #0071e3; color: white; border: none; padding: 0.4rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: background 0.2s; }
+        .update-status-btn:hover { background: #005bb5; }
+
+        .flash-message { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+        .flash-success { background: #e6f7e6; color: #10b981; }
+        .flash-error { background: #fee2e2; color: #ef4444; }
+        .empty-orders { text-align: center; padding: 3rem; color: #86868b; }
+
+        @media (max-width: 768px) { .nav-links { display: none; } .container { padding: 0 1rem; } }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/admin" class="logo">iStore Admin</a>
+        <div class="nav-links">
+            <a href="/admin">Дашборд</a>
+            <a href="/admin/products">Товары</a>
+            <a href="/admin/orders" class="active">Заказы</a>
+            <a href="/admin/categories">Категории</a>
+        </div>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}">admin</span>
+            <form action="/logout" method="post">
+                <button type="submit" class="logout-btn">Выйти</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Управление заказами</h1>
+        <a id="exportLink" href="/admin/orders/report/word" class="report-btn">Экспорт в Word</a>
+    </div>
+
+    <div th:if="${message}" class="flash-message flash-success" th:text="${message}"></div>
+    <div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
+
+    <div class="filters">
+        <a href="/admin/orders" class="filter-btn" th:classappend="${currentStatus == null} ? 'active'">Все</a>
+        <a th:each="status : ${statuses}" th:href="@{/admin/orders(status=${status})}"
+           th:text="${status == 'NEW' ? 'Новые' : (status == 'SHIPPED' ? 'Отправленные' : (status == 'DELIVERED' ? 'Доставленные' : 'Отменённые'))}"
+           class="filter-btn" th:classappend="${currentStatus == status} ? 'active'"></a>
+    </div>
+
+    <div class="orders-section">
+        <div th:if="${orders.isEmpty()}" class="empty-orders">Заказов пока нет</div>
+
+        <div class="orders-grid" th:unless="${orders.isEmpty()}">
+            <div th:each="order : ${orders}" class="order-card">
+                <div class="order-header">
+                    <span class="order-number">Заказ №<span th:text="${order.id}">12345</span></span>
+                    <span class="order-date"><span th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2024 12:00</span></span>
+                    <span class="order-status" th:classappend="'status-' + ${order.status}"
+                          th:text="${order.status == 'NEW' ? 'НОВЫЙ' : (order.status == 'SHIPPED' ? 'ОТПРАВЛЕН' : (order.status == 'DELIVERED' ? 'ДОСТАВЛЕН' : 'ОТМЕНЁН'))}">
+                        НОВЫЙ
+                    </span>
+                </div>
+
+                <div class="order-body">
+                    <div class="order-info-block">
+                        <h4>КЛИЕНТ</h4>
+                        <p th:text="${order.customerName}">Иван Иванов</p>
+                        <p th:text="${order.customerPhone}" style="font-size: 0.85rem; color: #0071e3;">+375291234567</p>
+                    </div>
+
+                    <div class="order-info-block order-address">
+                        <h4>АДРЕС ДОСТАВКИ</h4>
+                        <p th:text="${order.deliveryAddress}">г. Минск, ул. Пушкина, д. 10, кв. 5</p>
+                    </div>
+
+                    <div class="order-info-block">
+                        <h4>ОПЛАТА</h4>
+                        <p th:text="${order.paymentType == 'CARD' ? 'Банковская карта' : 'Наличными при получении'}">Банковская карта</p>
+                        <p th:if="${order.comment}" style="font-size: 0.75rem; color: #666; margin-top: 0.5rem;" th:text="'Комментарий: ' + ${order.comment}"></p>
+                    </div>
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total"><span th:text="${order.totalCost}"></span> руб.</div>
+                    <div class="status-form">
+                        <span class="status-label">ИЗМЕНИТЬ СТАТУС:</span>
+                        <form method="post" action="/admin/orders/update-status" style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="hidden" name="orderId" th:value="${order.id}">
+                            <select name="status" class="status-select">
+                                <option value="NEW" th:selected="${order.status == 'NEW'}">Новый</option>
+                                <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Отправлен</option>
+                                <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Доставлен</option>
+                                <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Отменён</option>
+                            </select>
+                            <button type="submit" class="update-status-btn">Обновить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Обновляем ссылку экспорта с текущим фильтром
+    function updateExportLink() {
+        const currentUrl = window.location.href;
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        const exportLink = document.getElementById('exportLink');
+
+        if (status && status !== 'null') {
+            exportLink.href = '/admin/orders/report/word?status=' + encodeURIComponent(status);
+        } else {
+            exportLink.href = '/admin/orders/report/word';
+        }
+    }
+
+    // Вызываем при загрузке
+    updateExportLink();
+
+    // Следим за изменением фильтров через MutationObserver
+    const filterLinks = document.querySelectorAll('.filter-btn');
+    filterLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            setTimeout(updateExportLink, 100);
+        });
+    });
+
+    setTimeout(() => {
+        const flash = document.querySelector('.flash-message');
+        if (flash) flash.style.display = 'none';
+    }, 3000);
+</script>
+</body>
+</html>

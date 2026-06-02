@@ -19,8 +19,9 @@ public class Category {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(unique = true)                // ← НОВОЕ ПОЛЕ
-    private String slug;                  // ← НОВОЕ ПОЛЕ
+    @Column(unique = true)
+    private String slug;
 
-    // геттеры и сеттеры (Lombok @Data уже генерирует)
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder = 0;
 }

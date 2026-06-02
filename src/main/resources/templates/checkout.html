@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа | iStore</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; }
+        body { background: #f5f5f7; }
+        .nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo { font-size: 1.5rem; font-weight: 600; text-decoration: none; color: #0071e3; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 2rem; }
+        .form-card { background: white; border-radius: 24px; padding: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .form-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .cart-items { background: #f8f8fc; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; }
+        .cart-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+        .cart-item:last-child { border-bottom: none; }
+        .subtotal, .delivery, .total { display: flex; justify-content: space-between; margin-top: 0.5rem; padding-top: 0.5rem; }
+        .total { font-size: 1.2rem; font-weight: bold; color: #0071e3; border-top: 1px solid #ddd; margin-top: 1rem; padding-top: 1rem; }
+        .delivery-free { color: #10b981; }
+        .delivery-paid { color: #f59e0b; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #333; }
+        input, select, textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #0071e3; }
+        input.error { border-color: #ef4444; background: #fff5f5; }
+        input.valid { border-color: #10b981; background: #f0fdf4; }
+        .error-message { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; display: block; min-height: 1.2rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .address-preview { background: #f8f8fc; padding: 1rem; border-radius: 12px; margin-top: 1rem; border-left: 4px solid #10b981; }
+        .address-preview p { font-size: 0.9rem; color: #333; }
+
+        .btn-submit { background: #0071e3; color: white; border: none; padding: 1rem; border-radius: 40px; width: 100%; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+        .btn-submit:hover { background: #005bb5; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+        .back-link { display: inline-block; margin-top: 1rem; color: #0071e3; text-decoration: none; }
+        .flash-message { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+        .flash-error { background: #fee2e2; color: #ef4444; }
+        .flash-success { background: #e6f7e6; color: #10b981; }
+        @media (max-width: 768px) { .container { padding: 0 1rem; } .form-card { padding: 1.5rem; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/main" class="logo">iStore</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-card">
+        <h1 class="form-title">Оформление заказа</h1>
+
+        <div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
+        <div th:if="${message}" class="flash-message flash-success" th:text="${message}"></div>
+
+        <div class="cart-items">
+            <h3 style="margin-bottom: 0.5rem;">Ваши товары:</h3>
+            <div th:each="item : ${cartItems}" class="cart-item">
+                <span th:text="${item.product.name} + ' × ' + ${item.quantity}"></span>
+                <span th:text="${item.product.price * item.quantity} + ' руб.'"></span>
+            </div>
+            <div class="subtotal">
+                <span>Сумма товаров:</span>
+                <span th:text="${subtotal} + ' руб.'">0 руб.</span>
+            </div>
+            <div class="delivery">
+                <span>Доставка по Беларуси:</span>
+                <span th:if="${subtotal >= 1000}" class="delivery-free">Бесплатно</span>
+                <span th:if="${subtotal < 1000}" class="delivery-paid">30 руб.</span>
+            </div>
+            <div class="total">
+                <span>Итого к оплате:</span>
+                <span th:text="${total} + ' руб.'">0 руб.</span>
+            </div>
+        </div>
+
+        <form id="orderForm" th:action="@{/order/create}" method="post">
+            <div class="form-group">
+                <label>ФИО получателя</label>
+                <input type="text" name="customerName" id="customerName" th:value="${user.fullName}" required>
+                <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Телефон для связи</label>
+                <input type="tel" name="customerPhone" id="customerPhone" th:value="${user.phone}" required>
+                <span class="error-message" id="phoneError"></span>
+            </div>
+
+            <!-- Раздельные поля адреса -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Город</label>
+                    <input type="text" name="city" id="city" required placeholder="Минск, Гомель, Витебск...">
+                    <span class="error-message" id="cityError"></span>
+                </div>
+                <div class="form-group">
+                    <label>Улица</label>
+                    <input type="text" name="street" id="street" required placeholder="ул. Пушкина, пр. Независимости...">
+                    <span class="error-message" id="streetError"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Номер дома</label>
+                    <input type="text" name="house" id="house" required placeholder="10, 25А, 7/2...">
+                    <span class="error-message" id="houseError"></span>
+                </div>
+                <div class="form-group">
+                    <label>Квартира / офис (необязательно)</label>
+                    <input type="text" name="apartment" id="apartment" placeholder="5, 123, 45...">
+                </div>
+            </div>
+
+            <!-- Предпросмотр адреса -->
+            <div class="address-preview" id="addressPreview" style="display: none;">
+                <p>Адрес доставки: <span id="previewText"></span></p>
+            </div>
+
+            <div class="form-group">
+                <label>Способ оплаты</label>
+                <select name="paymentType" id="paymentType" required>
+                    <option value="CARD">Банковская карта онлайн</option>
+                    <option value="CASH">Наличными при получении</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Комментарий к заказу</label>
+                <textarea name="comment" rows="2" placeholder="Пожелания, удобное время доставки..."></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-submit">Подтвердить заказ</button>
+        </form>
+
+        <a href="/cart" class="back-link">← Вернуться в корзину</a>
+    </div>
+</div>
+
+<script>
+    const nameInput = document.getElementById('customerName');
+    const phoneInput = document.getElementById('customerPhone');
+    const cityInput = document.getElementById('city');
+    const streetInput = document.getElementById('street');
+    const houseInput = document.getElementById('house');
+    const apartmentInput = document.getElementById('apartment');
+    const submitBtn = document.getElementById('submitBtn');
+    const previewDiv = document.getElementById('addressPreview');
+    const previewText = document.getElementById('previewText');
+
+    // Валидация ФИО
+    function validateName() {
+        const value = nameInput.value.trim();
+        if (value.length === 0) {
+            document.getElementById('nameError').textContent = 'ФИО обязательно для заполнения';
+            nameInput.classList.add('error');
+            nameInput.classList.remove('valid');
+            return false;
+        } else if (value.length < 3) {
+            document.getElementById('nameError').textContent = 'ФИО должно содержать минимум 3 символа';
+            nameInput.classList.add('error');
+            nameInput.classList.remove('valid');
+            return false;
+        } else if (value.length > 100) {
+            document.getElementById('nameError').textContent = 'ФИО не должно превышать 100 символов';
+            nameInput.classList.add('error');
+            nameInput.classList.remove('valid');
+            return false;
+        } else {
+            document.getElementById('nameError').textContent = '';
+            nameInput.classList.remove('error');
+            nameInput.classList.add('valid');
+            return true;
+        }
+    }
+
+    // Валидация телефона
+    function validatePhone() {
+        const value = phoneInput.value.trim();
+        const hasDigits = /\d/.test(value);
+        if (value.length === 0) {
+            document.getElementById('phoneError').textContent = 'Телефон обязателен для заполнения';
+            phoneInput.classList.add('error');
+            phoneInput.classList.remove('valid');
+            return false;
+        } else if (!hasDigits || value.length < 7) {
+            document.getElementById('phoneError').textContent = 'Введите корректный номер телефона (минимум 7 цифр)';
+            phoneInput.classList.add('error');
+            phoneInput.classList.remove('valid');
+            return false;
+        } else {
+            document.getElementById('phoneError').textContent = '';
+            phoneInput.classList.remove('error');
+            phoneInput.classList.add('valid');
+            return true;
+        }
+    }
+
+    // Валидация города
+    function validateCity() {
+        const value = cityInput.value.trim();
+        if (value.length === 0) {
+            document.getElementById('cityError').textContent = 'Укажите город';
+            cityInput.classList.add('error');
+            cityInput.classList.remove('valid');
+            return false;
+        } else if (value.length < 2) {
+            document.getElementById('cityError').textContent = 'Название города слишком короткое';
+            cityInput.classList.add('error');
+            cityInput.classList.remove('valid');
+            return false;
+        } else {
+            document.getElementById('cityError').textContent = '';
+            cityInput.classList.remove('error');
+            cityInput.classList.add('valid');
+            return true;
+        }
+    }
+
+    // Валидация улицы
+    function validateStreet() {
+        const value = streetInput.value.trim();
+        if (value.length === 0) {
+            document.getElementById('streetError').textContent = 'Укажите улицу';
+            streetInput.classList.add('error');
+            streetInput.classList.remove('valid');
+            return false;
+        } else if (value.length < 2) {
+            document.getElementById('streetError').textContent = 'Название улицы слишком короткое';
+            streetInput.classList.add('error');
+            streetInput.classList.remove('valid');
+            return false;
+        } else {
+            document.getElementById('streetError').textContent = '';
+            streetInput.classList.remove('error');
+            streetInput.classList.add('valid');
+            return true;
+        }
+    }
+
+    // Валидация дома
+    function validateHouse() {
+        const value = houseInput.value.trim();
+        if (value.length === 0) {
+            document.getElementById('houseError').textContent = 'Укажите номер дома';
+            houseInput.classList.add('error');
+            houseInput.classList.remove('valid');
+            return false;
+        } else {
+            document.getElementById('houseError').textContent = '';
+            houseInput.classList.remove('error');
+            houseInput.classList.add('valid');
+            return true;
+        }
+    }
+
+    // Обновление предпросмотра адреса
+    function updateAddressPreview() {
+        const city = cityInput.value.trim();
+        const street = streetInput.value.trim();
+        const house = houseInput.value.trim();
+        const apartment = apartmentInput.value.trim();
+
+        if (city && street && house) {
+            let fullAddress = city + ', ' + street + ', д. ' + house;
+            if (apartment) {
+                fullAddress += ', кв. ' + apartment;
+            }
+            previewText.textContent = fullAddress;
+            previewDiv.style.display = 'block';
+        } else {
+            previewDiv.style.display = 'none';
+        }
+    }
+
+    // Все проверки
+    function validateAll() {
+        const isNameValid = validateName();
+        const isPhoneValid = validatePhone();
+        const isCityValid = validateCity();
+        const isStreetValid = validateStreet();
+        const isHouseValid = validateHouse();
+
+        const isValid = isNameValid && isPhoneValid && isCityValid && isStreetValid && isHouseValid;
+        submitBtn.disabled = !isValid;
+        return isValid;
+    }
+
+    // Сборка полного адреса для отправки
+    function buildFullAddress() {
+        const city = cityInput.value.trim();
+        const street = streetInput.value.trim();
+        const house = houseInput.value.trim();
+        const apartment = apartmentInput.value.trim();
+
+        let fullAddress = city + ', ' + street + ', ' + house;
+        if (apartment) {
+            fullAddress += ', кв. ' + apartment;
+        }
+        return fullAddress;
+    }
+
+    // Обработчики событий
+    nameInput.addEventListener('input', validateAll);
+    phoneInput.addEventListener('input', validateAll);
+    cityInput.addEventListener('input', () => { validateCity(); updateAddressPreview(); validateAll(); });
+    streetInput.addEventListener('input', () => { validateStreet(); updateAddressPreview(); validateAll(); });
+    houseInput.addEventListener('input', () => { validateHouse(); updateAddressPreview(); validateAll(); });
+    apartmentInput.addEventListener('input', updateAddressPreview);
+
+    nameInput.addEventListener('blur', validateName);
+    phoneInput.addEventListener('blur', validatePhone);
+    cityInput.addEventListener('blur', validateCity);
+    streetInput.addEventListener('blur', validateStreet);
+    houseInput.addEventListener('blur', validateHouse);
+
+    // Отправка формы
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+        if (!validateAll()) {
+            e.preventDefault();
+            alert('Пожалуйста, заполните все поля корректно');
+            return;
+        }
+
+        // Создаём скрытое поле с полным адресом
+        const fullAddress = buildFullAddress();
+        const addressInput = document.createElement('input');
+        addressInput.type = 'hidden';
+        addressInput.name = 'deliveryAddress';
+        addressInput.value = fullAddress;
+        this.appendChild(addressInput);
+    });
+
+    // Инициализация
+    validateAll();
+</script>
+
+</body>
+</html>

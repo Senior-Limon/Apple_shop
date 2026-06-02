@@ -26,8 +26,25 @@
         .breadcrumb a { color: #0071e3; text-decoration: none; }
         .breadcrumb a:hover { text-decoration: underline; }
         .product-detail { max-width: 1280px; margin: 2rem auto 0; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
-        .product-gallery { background: white; border-radius: 32px; padding: 2rem; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
-        .product-gallery img { max-width: 100%; max-height: 400px; object-fit: contain; }
+
+        /* Галерея */
+        .product-gallery { background: white; border-radius: 32px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
+        .main-image { text-align: center; margin-bottom: 1rem; position: relative; }
+        .main-image img { max-width: 100%; max-height: 400px; object-fit: contain; }
+        .thumbnail-list { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .thumbnail { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+        .thumbnail:hover { border-color: #0071e3; transform: scale(1.05); }
+        .thumbnail.active { border-color: #0071e3; box-shadow: 0 0 0 2px rgba(0,113,227,0.3); }
+
+        /* Стрелки для навигации по миниатюрам */
+        .thumb-nav { display: flex; align-items: center; gap: 0.5rem; }
+        .thumb-prev, .thumb-next { background: white; border: 1px solid #ddd; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .thumb-prev:hover, .thumb-next:hover { background: #0071e3; color: white; border-color: #0071e3; }
+        .thumb-scroll { display: flex; gap: 0.5rem; overflow-x: auto; scroll-behavior: smooth; padding: 0.2rem; max-width: 400px; }
+        .thumb-scroll::-webkit-scrollbar { height: 4px; }
+        .thumb-scroll::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 4px; }
+        .thumb-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
         .product-info { background: white; border-radius: 32px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
         .product-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
         .product-specs { font-size: 0.9rem; color: #86868b; margin-bottom: 1rem; border-bottom: 1px solid #f0f0f0; padding-bottom: 1rem; }
@@ -35,6 +52,9 @@
         .btn { display: inline-block; width: 100%; padding: 0.9rem; border-radius: 40px; font-weight: 600; text-align: center; cursor: pointer; border: none; transition: background 0.2s; text-decoration: none; font-size: 1rem; }
         .btn-primary { background: #0071e3; color: white; }
         .btn-primary:hover { background: #005bb5; }
+        .quantity-selector { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; justify-content: center; }
+        .qty-btn { padding: 0.5rem 1rem; border-radius: 40px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 1.2rem; width: 44px; }
+        .qty-input { width: 80px; text-align: center; border-radius: 40px; border: 1px solid #ddd; padding: 0.5rem; font-size: 1rem; }
         .product-description-section { max-width: 1280px; margin: 2rem auto; padding: 0 2rem; }
         .description-card { background: white; border-radius: 32px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
         .description-card h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
@@ -57,24 +77,19 @@
 
 <nav class="nav">
     <div class="nav-container">
-        <a href="/" class="logo">iStore</a>
+        <a href="/main" class="logo">iStore</a>
         <div class="nav-links">
-            <a href="/category/iphone">iPhone</a>
-            <a href="/category/mac">Mac</a>
-            <a href="/category/ipad">iPad</a>
-            <a href="/category/airpods">AirPods</a>
-            <a href="/category/accessories">Аксессуары</a>
+            <a th:each="cat : ${categories}" th:href="@{'/category/' + ${cat.slug}}" th:text="${cat.name}">iPhone</a>
         </div>
         <div class="nav-icons">
-            <a href="/search">🔍</a>
             <a href="/cart">🛒</a>
-            <a href="/logout">🚪</a>
+            <a href="/profile">👤</a>
         </div>
     </div>
 </nav>
 
 <div class="breadcrumb" th:if="${product != null}">
-    <a href="/">Главная</a> /
+    <a href="/main">Главная</a> /
     <a th:href="@{'/category/' + ${product.category.slug}}" th:text="${product.category.name}">Категория</a> /
     <span th:text="${product.name}">Товар</span>
 </div>
@@ -83,10 +98,30 @@
 <div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
 
 <div class="product-detail" th:if="${product != null}">
+    <!-- Галерея с миниатюрами -->
     <div class="product-gallery">
-        <img th:if="${product.mainImage != null}" th:src="@{${product.mainImage.imageUrl}}" alt="product image">
-        <img th:if="${product.mainImage == null}" src="/images/no-image.png" alt="product image">
+        <div class="main-image">
+            <img id="mainImage" th:src="${product.images != null and !product.images.empty ? product.images[0].imageUrl : '/images/no-image.png'}" alt="product image">
+        </div>
+        <div th:if="${product.images != null and product.images.size() > 0}" class="thumbnail-list">
+            <div class="thumb-nav">
+                <button class="thumb-prev" onclick="scrollThumbs(-1)">←</button>
+            </div>
+            <div id="thumbScroll" class="thumb-scroll">
+                <img th:each="img,iterStat : ${product.images}"
+                     th:src="${img.imageUrl}"
+                     class="thumbnail"
+                     th:classappend="${iterStat.index == 0} ? 'active'"
+                     th:data-index="${iterStat.index}"
+                     th:data-url="${img.imageUrl}"
+                     onclick="changeImage(this)">
+            </div>
+            <div class="thumb-nav">
+                <button class="thumb-next" onclick="scrollThumbs(1)">→</button>
+            </div>
+        </div>
     </div>
+
     <div class="product-info">
         <h1 class="product-title" th:text="${product.name}">iPhone 14</h1>
         <div class="product-specs">
@@ -96,10 +131,13 @@
         </div>
         <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 1, 2, 'COMMA')} + ' BYN'">1700 BYN</div>
 
-        <!-- Форма без redirectUrl -->
         <form method="post" th:action="@{/cart/add}">
             <input type="hidden" name="productId" th:value="${product.id}">
-            <input type="hidden" name="quantity" value="1">
+            <div class="quantity-selector">
+                <button type="button" class="qty-btn" onclick="decrement()">−</button>
+                <input type="number" name="quantity" id="quantity" value="1" min="1" class="qty-input">
+                <button type="button" class="qty-btn" onclick="increment()">+</button>
+            </div>
             <button type="submit" class="btn btn-primary">В корзину</button>
         </form>
     </div>
@@ -108,34 +146,49 @@
 <div class="product-description-section" th:if="${product != null and product.description != null}">
     <div class="description-card">
         <h2>Описание</h2>
-        <p th:text="${product.description}">Здесь будет подробное описание товара. Оригинальный iPhone, новый, в заводской упаковке. Гарантия 36 месяцев.</p>
+        <p th:text="${product.description}">Здесь будет подробное описание товара.</p>
     </div>
 </div>
 
 <div class="features-grid">
-    <div class="feature-card">
-        <div class="feature-icon">✅</div>
-        <div class="feature-title">Оригинальная продукция</div>
-        <div class="feature-text">Продаем только оригинальную продукцию Apple</div>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">🛡️</div>
-        <div class="feature-title">Качество и гарантия</div>
-        <div class="feature-text">Гарантия на всю технику 36 месяцев</div>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">🎁</div>
-        <div class="feature-title">Подарки</div>
-        <div class="feature-text">Всем клиентам дарим Чехол и Стекло на iPhone</div>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">🚚</div>
-        <div class="feature-title">Бесплатная доставка</div>
-        <div class="feature-text">При заказе от 1000 byn</div>
-    </div>
+    <div class="feature-card"><div class="feature-icon">✅</div><div class="feature-title">Оригинальная продукция</div><div class="feature-text">Продаем только оригинальную продукцию Apple</div></div>
+    <div class="feature-card"><div class="feature-icon">🛡️</div><div class="feature-title">Качество и гарантия</div><div class="feature-text">Гарантия на всю технику 36 месяцев</div></div>
+    <div class="feature-card"><div class="feature-icon">🎁</div><div class="feature-title">Подарки</div><div class="feature-text">Всем клиентам дарим Чехол и Стекло на iPhone</div></div>
+    <div class="feature-card"><div class="feature-icon">🚚</div><div class="feature-title">Бесплатная доставка</div><div class="feature-text">При заказе от 1000 byn</div></div>
 </div>
 
 <script>
+    function changeImage(element) {
+        const mainImage = document.getElementById('mainImage');
+        const newUrl = element.getAttribute('data-url');
+        mainImage.src = newUrl;
+
+        document.querySelectorAll('.thumbnail').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        element.classList.add('active');
+    }
+
+    function scrollThumbs(direction) {
+        const container = document.getElementById('thumbScroll');
+        if (container) {
+            const scrollAmount = 120;
+            container.scrollLeft += direction * scrollAmount;
+        }
+    }
+
+    function decrement() {
+        const qtyInput = document.getElementById('quantity');
+        let val = parseInt(qtyInput.value);
+        if (val > 1) qtyInput.value = val - 1;
+    }
+
+    function increment() {
+        const qtyInput = document.getElementById('quantity');
+        let val = parseInt(qtyInput.value);
+        qtyInput.value = val + 1;
+    }
+
     setTimeout(() => {
         const flash = document.querySelector('.flash-message');
         if (flash) flash.style.display = 'none';

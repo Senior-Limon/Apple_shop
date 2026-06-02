@@ -5,245 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${categoryName} + ' | iStore'"></title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif; }
         body { background-color: #fbfbfd; color: #1d1c1e; }
-
-        /* Хлебные крошки */
-        .breadcrumb {
-            max-width: 1280px;
-            margin: 1.5rem auto 0;
-            padding: 0 2rem;
-            font-size: 0.9rem;
-            color: #86868b;
-        }
+        .nav { background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; flex-wrap: wrap; gap: 1rem; }
+        .logo { font-size: 1.8rem; font-weight: 600; background: linear-gradient(135deg, #000, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .nav-links a { color: #1d1c1e; text-decoration: none; font-size: 0.95rem; font-weight: 500; opacity: 0.8; transition: opacity 0.3s; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-icons { display: flex; gap: 1.8rem; align-items: center; }
+        .nav-icons a { color: #1d1c1e; text-decoration: none; font-size: 1.2rem; transition: color 0.3s; }
+        .nav-icons a:hover { color: #0071e3; }
+        .breadcrumb { max-width: 1280px; margin: 1.5rem auto 0; padding: 0 2rem; font-size: 0.9rem; color: #86868b; }
         .breadcrumb a { color: #0071e3; text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
+        .category-header { text-align: center; margin: 2rem 0 1rem; }
+        .category-header h1 { font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, #1d1c1e, #434344); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .toolbar { max-width: 1280px; margin: 1rem auto 2rem; padding: 0 2rem; display: flex; justify-content: flex-end; align-items: center; gap: 1rem; }
+        .sort-select { padding: 0.5rem 1rem; border-radius: 30px; border: 1px solid #ddd; background: white; cursor: pointer; }
 
-        /* Заголовок категории */
-        .category-header {
-            text-align: center;
-            margin: 2rem 0 1rem;
-        }
-        .category-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1d1c1e, #434344);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
-        }
+        /* Карусель для карточек товаров */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; max-width: 1280px; margin: 2rem auto; padding: 0 2rem; }
+        .product-card { background: white; border-radius: 28px; padding: 1.5rem; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 10px 30px rgba(0,0,0,0.02); position: relative; }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,113,227,0.12); }
 
-        /* Панель сортировки */
-        .toolbar {
-            max-width: 1280px;
-            margin: 1rem auto 2rem;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 1rem;
-        }
-        .sort-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        .sort-select {
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            border: 1px solid #ddd;
-            background: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .sort-select:hover {
-            border-color: #0071e3;
-        }
-        .reset-btn {
-            background: none;
-            border: none;
-            color: #0071e3;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-decoration: underline;
-            opacity: 0.7;
-        }
-        .reset-btn:hover {
-            opacity: 1;
-        }
+        .carousel-container { position: relative; height: 220px; margin-bottom: 1rem; border-radius: 20px; overflow: hidden; background: #f5f5f7; }
+        .carousel-slides { display: flex; transition: transform 0.3s ease-in-out; height: 100%; }
+        .carousel-slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .carousel-slide img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 10; }
+        .product-card:hover .carousel-btn { opacity: 1; }
+        .carousel-btn:hover { background: white; }
+        .carousel-prev { left: 10px; }
+        .carousel-next { right: 10px; }
+        .carousel-dots { position: absolute; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; z-index: 10; }
+        .carousel-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.3); cursor: pointer; transition: all 0.2s; }
+        .carousel-dot.active { width: 20px; border-radius: 3px; background: #0071e3; }
+        .image-count-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; font-size: 11px; padding: 2px 8px; border-radius: 20px; z-index: 10; }
 
-        /* Сетка товаров */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1280px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-        .product-card {
-            background: white;
-            border-radius: 28px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 113, 227, 0.12);
-            border-color: rgba(0, 113, 227, 0.2);
-        }
-
-        .product-image {
-            height: 220px;
-            background: #f5f5f7;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-        .product-image img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-        .product-card:hover .product-image img {
-            transform: scale(1.02);
-        }
-
-        .product-title-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        .product-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-        .product-title-link:hover .product-title {
-            color: #0071e3;
-        }
-
-        .product-specs {
-            font-size: 0.85rem;
-            color: #86868b;
-            margin-bottom: 0.5rem;
-        }
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0071e3;
-            margin: 0.5rem 0;
-        }
-        .btn-add {
-            width: 100%;
-            background: #0071e3;
-            color: white;
-            border: none;
-            padding: 0.7rem;
-            border-radius: 40px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            margin-top: auto;
-        }
-        .btn-add:hover {
-            background: #005bb5;
-            transform: scale(1.01);
-        }
-        .btn-add:active {
-            transform: scale(0.98);
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 4rem;
-            color: #86868b;
-            font-size: 1.2rem;
-        }
-
-        /* Flash-сообщения */
-        .flash-message {
-            max-width: 1280px;
-            margin: 1rem auto 0;
-            padding: 0.8rem 2rem;
-            border-radius: 40px;
-            text-align: center;
-            font-weight: 500;
-        }
+        .product-title-link { text-decoration: none; color: inherit; }
+        .product-title { font-size: 1.25rem; font-weight: 600; }
+        .product-title-link:hover .product-title { color: #0071e3; }
+        .product-specs { font-size: 0.85rem; color: #86868b; margin-bottom: 0.5rem; }
+        .product-price { font-size: 1.5rem; font-weight: 700; color: #0071e3; margin: 0.5rem 0; }
+        .btn-add { width: 100%; background: #0071e3; color: white; border: none; padding: 0.7rem; border-radius: 40px; cursor: pointer; transition: background 0.2s; }
+        .btn-add:hover { background: #005bb5; }
+        .empty-message { text-align: center; padding: 4rem; color: #86868b; }
+        .flash-message { max-width: 1280px; margin: 1rem auto 0; padding: 0.8rem 2rem; border-radius: 40px; text-align: center; }
         .flash-success { background: #10b981; color: white; }
         .flash-error { background: #ef4444; color: white; }
 
-        @media (max-width: 768px) {
-            .product-grid {
-                grid-template-columns: 1fr;
-                padding: 0 1rem;
-            }
-            .category-header h1 { font-size: 2rem; }
-            .toolbar {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-        }
+        @media (max-width: 768px) { .product-grid { grid-template-columns: 1fr; } .category-header h1 { font-size: 2rem; } .carousel-btn { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="breadcrumb">
-    <a href="/">Главная</a> / <span th:text="${categoryName}"></span>
-</div>
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/main" class="logo">iStore</a>
+        <div class="nav-links">
+            <a th:each="cat : ${categories}" th:href="@{'/category/' + ${cat.slug}}" th:text="${cat.name}">iPhone</a>
+        </div>
+        <div class="nav-icons">
+            <a href="/cart">🛒</a>
+            <a href="/profile">👤</a>
+        </div>
+    </div>
+</nav>
 
-<div th:if="${message}" class="flash-message flash-success" th:text="${message}"></div>
-<div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
+<div class="breadcrumb">
+    <a href="/main">Главная</a> / <span th:text="${categoryName}"></span>
+</div>
 
 <div class="category-header">
     <h1 th:text="${categoryName}">Категория</h1>
-    <h3>Click on the name of product</h3>
 </div>
 
-<!-- Панель сортировки -->
 <div class="toolbar">
-    <span class="sort-label">Сортировать:</span>
     <select id="sortSelect" class="sort-select">
-        <option value="default">По умолчанию</option>
-        <option value="price_asc">Цена: по возрастанию</option>
-        <option value="price_desc">Цена: по убыванию</option>
-        <option value="name_asc">Название: А-Я</option>
-        <option value="name_desc">Название: Я-А</option>
+        <option value="default" th:selected="${currentSort == null}">По умолчанию</option>
+        <option value="price_asc" th:selected="${currentSort == 'price_asc'}">Цена: по возрастанию</option>
+        <option value="price_desc" th:selected="${currentSort == 'price_desc'}">Цена: по убыванию</option>
+        <option value="name_asc" th:selected="${currentSort == 'name_asc'}">Название: А-Я</option>
+        <option value="name_desc" th:selected="${currentSort == 'name_desc'}">Название: Я-А</option>
     </select>
-    <button id="resetSort" class="reset-btn">Сбросить</button>
 </div>
 
 <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
-    <div th:each="p : ${products}" class="product-card">
-        <div class="product-image">
-            <img th:if="${p.mainImage != null}" th:src="@{${p.mainImage.imageUrl}}" alt="Product image">
-            <img th:if="${p.mainImage == null}" src="/images/no-image.png" alt="No image">
+    <div th:each="p,iterStat : ${products}" class="product-card" th:data-product-id="${p.id}">
+        <div class="carousel-container">
+            <div th:if="${p.images != null and p.images.size() > 1}" class="image-count-badge" th:text="${p.images.size()} + ' фото'"></div>
+            <div class="carousel-slides" th:id="'slides-' + ${p.id}">
+                <div th:each="img : ${p.images}" class="carousel-slide">
+                    <img th:src="${img.imageUrl}" alt="product image">
+                </div>
+                <div th:if="${p.images == null or p.images.isEmpty()}" class="carousel-slide">
+                    <img src="/images/no-image.png" alt="no image">
+                </div>
+            </div>
+            <button class="carousel-btn carousel-prev" th:onclick="'prevSlide(' + ${p.id} + ')'">‹</button>
+            <button class="carousel-btn carousel-next" th:onclick="'nextSlide(' + ${p.id} + ')'">›</button>
+            <div class="carousel-dots" th:id="'dots-' + ${p.id}"></div>
         </div>
+
         <a th:href="@{/product/{id}(id=${p.id})}" class="product-title-link">
-            <div class="product-title" th:text="${p.name}">iPhone 15 Pro</div>
+            <div class="product-title" th:text="${p.name}">Товар</div>
         </a>
         <div class="product-specs">
             <span th:if="${p.memory}" th:text="${p.memory}"></span>
             <span th:if="${p.color}" th:text="', ' + ${p.color}"></span>
-            <span th:if="${p.chip}" th:text="', ' + ${p.chip}"></span>
         </div>
-        <div class="product-price" th:text="${#numbers.formatDecimal(p.price, 1, 2, 'COMMA')} + ' BYN'"></div>
-
+        <div class="product-price" th:text="${p.price} + ' BYN'"></div>
         <form method="post" th:action="@{/cart/add}">
             <input type="hidden" name="productId" th:value="${p.id}">
             <input type="hidden" name="quantity" value="1">
@@ -253,39 +124,92 @@
 </div>
 
 <div th:if="${products == null or products.isEmpty()}" class="empty-message">
-    🛍️ Товаров в этой категории пока нет.<br>
-    Загляните позже!
+    Товаров в этой категории пока нет.
 </div>
 
 <script>
-    // Сортировка через URL-параметр
-    const sortSelect = document.getElementById('sortSelect');
-    const resetBtn = document.getElementById('resetSort');
+    const slideIndexMap = new Map();
 
-    function applySort() {
-        const value = sortSelect.value;
-        const url = new URL(window.location.href);
-        if (value === 'default') {
-            url.searchParams.delete('sort');
-        } else {
-            url.searchParams.set('sort', value);
-        }
-        window.location.href = url.toString();
+    function initCarousel(productId, imageCount) {
+        if (imageCount <= 1) return;
+        slideIndexMap.set(productId, 0);
+        createDots(productId, imageCount);
     }
 
-    sortSelect.addEventListener('change', applySort);
-    resetBtn.addEventListener('click', () => {
-        window.location.href = window.location.pathname;
+    function updateCarousel(productId, imageCount) {
+        const slides = document.getElementById('slides-' + productId);
+        const index = slideIndexMap.get(productId) || 0;
+        if (slides) slides.style.transform = 'translateX(-' + (index * 100) + '%)';
+        updateDots(productId, index);
+    }
+
+    function createDots(productId, imageCount) {
+        const dotsContainer = document.getElementById('dots-' + productId);
+        if (!dotsContainer) return;
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < imageCount; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'carousel-dot';
+            dot.onclick = () => goToSlide(productId, i, imageCount);
+            dotsContainer.appendChild(dot);
+        }
+        updateDots(productId, 0);
+    }
+
+    function updateDots(productId, activeIndex) {
+        const dotsContainer = document.getElementById('dots-' + productId);
+        if (!dotsContainer) return;
+        const dots = dotsContainer.children;
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].classList.toggle('active', i === activeIndex);
+        }
+    }
+
+    function goToSlide(productId, index, imageCount) {
+        slideIndexMap.set(productId, index);
+        updateCarousel(productId, imageCount);
+    }
+
+    function prevSlide(productId) {
+        const slides = document.getElementById('slides-' + productId);
+        const imageCount = slides ? slides.children.length : 1;
+        let index = slideIndexMap.get(productId) || 0;
+        index = (index - 1 + imageCount) % imageCount;
+        slideIndexMap.set(productId, index);
+        updateCarousel(productId, imageCount);
+    }
+
+    function nextSlide(productId) {
+        const slides = document.getElementById('slides-' + productId);
+        const imageCount = slides ? slides.children.length : 1;
+        let index = slideIndexMap.get(productId) || 0;
+        index = (index + 1) % imageCount;
+        slideIndexMap.set(productId, index);
+        updateCarousel(productId, imageCount);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.product-card').forEach(card => {
+            const productId = parseInt(card.getAttribute('data-product-id'));
+            const slides = document.getElementById('slides-' + productId);
+            const imageCount = slides ? slides.children.length : 1;
+            if (imageCount > 1) initCarousel(productId, imageCount);
+        });
     });
 
-    // Установка выбранного значения из URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentSort = urlParams.get('sort');
-    if (currentSort) {
-        sortSelect.value = currentSort;
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            const url = new URL(window.location.href);
+            if (this.value === 'default') url.searchParams.delete('sort');
+            else url.searchParams.set('sort', this.value);
+            window.location.href = url.toString();
+        });
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSort = urlParams.get('sort');
+        if (currentSort) sortSelect.value = currentSort;
     }
 
-    // Автоматическое скрытие flash-сообщений
     setTimeout(() => {
         const flash = document.querySelector('.flash-message');
         if (flash) flash.style.display = 'none';

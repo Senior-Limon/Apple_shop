@@ -25,4 +25,6 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Long
             "LEFT JOIN FETCH p.images " +
             "WHERE p.category.id = :categoryId")
     List<Product> findByCategoryIdWithImages(@Param("categoryId") Long categoryId);
+
+
 }

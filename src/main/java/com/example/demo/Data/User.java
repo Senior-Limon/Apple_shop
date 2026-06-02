@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -16,22 +17,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 50)
-    private String login;
+    @Column(name = "login", unique = true, nullable = false, length = 100)
+    private String fullName;          // ← здесь храним ФИО (в БД колонка login)
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Column(unique = true, nullable = false)
     private String phone;
+
     private String role = "USER";
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     public User(Long userId) {
         this.id = userId;
     }
 
-    // Свой метод (Lombok не трогает)
     public boolean isAdmin() {
         return "ADMIN".equals(this.role);
     }
-}
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+}

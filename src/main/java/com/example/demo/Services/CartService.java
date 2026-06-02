@@ -18,10 +18,13 @@ public class CartService {
 
     @Autowired
     private CartRepository cartRepository;
+
     @Autowired
     private CartItemRepository cartItemRepository;
+
     @Autowired
     private ProductRepository productRepository;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -52,7 +55,6 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public List<CartItem> getCartItems(Long userId) {
-        // Используем метод с JOIN FETCH для загрузки изображений
         return cartItemRepository.findUserCartWithProductsAndImages(userId);
     }
 
@@ -69,5 +71,21 @@ public class CartService {
         CartItem item = cartItemRepository.findById(cartItemId).orElseThrow();
         if (!item.getCart().getUser().getId().equals(userId)) throw new RuntimeException("Not your cart");
         cartItemRepository.delete(item);
+    }
+
+    @Transactional
+    public void clearCart(Long userId) {
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+        if (cart != null) {
+            cartItemRepository.deleteByCartId(cart.getId());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public double getCartTotal(Long userId) {
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+        if (cart == null) return 0;
+        Double total = cartItemRepository.getCartTotal(cart.getId());
+        return total != null ? total : 0;
     }
 }

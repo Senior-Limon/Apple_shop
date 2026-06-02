@@ -11,182 +11,28 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
         }
-
-        body {
-            background-color: #fbfbfd;
-            color: #1d1c1e;
-            overflow-x: hidden;
-        }
-
-        .gradient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 30%, rgba(0, 113, 227, 0.03) 0%, transparent 40%),
-            radial-gradient(circle at 80% 70%, rgba(255, 45, 85, 0.03) 0%, transparent 40%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #000, #333);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: #1d1c1e;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-
-        .nav-links a:hover {
-            opacity: 1;
-        }
-
-        .nav-icons {
-            display: flex;
-            gap: 1.8rem;
-        }
-
-        .nav-icons a {
-            color: #1d1c1e;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-
-        .nav-icons a:hover {
-            color: #0071e3;
-        }
-
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            text-align: center;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .hero-text {
-            margin-bottom: 3rem;
-        }
-
-        .hero-text h1 {
-            font-size: 4rem;
-            font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #1d1c1e 0%, #434344 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-
-        .hero-text p {
-            font-size: 1.3rem;
-            color: #86868b;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .animation-container {
-            width: 400px;
-            height: 400px;
-            margin: 0 auto;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pulsing-sphere {
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0);
-            border-radius: 50%;
-            position: absolute;
-            box-shadow: 0 0 50px rgba(0, 113, 227, 0.3), inset -10px -10px 30px rgba(0,0,0,0.1), inset 10px 10px 30px rgba(255,255,255,0.8);
-            animation: spherePulse 3s ease-in-out infinite;
-            z-index: 2;
-        }
-
-        .sphere-text {
-            position: absolute;
-            z-index: 3;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0071e3;
-            text-shadow: 0 0 20px rgba(0, 113, 227, 0.5);
-            letter-spacing: 2px;
-            animation: textGlow 3s ease-in-out infinite;
-        }
-
-        .rotating-lines {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            animation: rotateClockwise 20s linear infinite;
-        }
-
-        .rotating-lines-2 {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            animation: rotateCounterClockwise 15s linear infinite;
-        }
-
-        .line {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(0, 113, 227, 0.2), rgba(0, 113, 227, 0.5), rgba(0, 113, 227, 0.2), transparent);
-            transform-origin: left center;
-            border-radius: 2px;
-        }
-
+        body { background-color: #fbfbfd; color: #1d1c1e; overflow-x: hidden; }
+        .gradient-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 30%, rgba(0, 113, 227, 0.03) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(255, 45, 85, 0.03) 0%, transparent 40%); z-index: -1; pointer-events: none; }
+        .nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; flex-wrap: wrap; gap: 1rem; }
+        .logo { font-size: 1.8rem; font-weight: 600; background: linear-gradient(135deg, #000, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: #1d1c1e; text-decoration: none; font-size: 0.95rem; font-weight: 500; opacity: 0.8; transition: opacity 0.3s; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-icons { display: flex; gap: 1.8rem; align-items: center; }
+        .nav-icons a { color: #1d1c1e; text-decoration: none; font-size: 1.2rem; transition: color 0.3s; }
+        .nav-icons a:hover { color: #0071e3; }
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .hero-content { text-align: center; max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+        .hero-text { margin-bottom: 3rem; }
+        .hero-text h1 { font-size: 4rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; background: linear-gradient(135deg, #1d1c1e 0%, #434344 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
+        .hero-text p { font-size: 1.3rem; color: #86868b; max-width: 600px; margin: 0 auto; }
+        .animation-container { width: 400px; height: 400px; margin: 0 auto; position: relative; display: flex; align-items: center; justify-content: center; }
+        .pulsing-sphere { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0); border-radius: 50%; position: absolute; box-shadow: 0 0 50px rgba(0, 113, 227, 0.3), inset -10px -10px 30px rgba(0,0,0,0.1), inset 10px 10px 30px rgba(255,255,255,0.8); animation: spherePulse 3s ease-in-out infinite; z-index: 2; }
+        .sphere-text { position: absolute; z-index: 3; font-size: 2rem; font-weight: 700; color: #0071e3; text-shadow: 0 0 20px rgba(0, 113, 227, 0.5); letter-spacing: 2px; animation: textGlow 3s ease-in-out infinite; }
+        .rotating-lines { position: absolute; width: 100%; height: 100%; animation: rotateClockwise 20s linear infinite; }
+        .rotating-lines-2 { position: absolute; width: 100%; height: 100%; animation: rotateCounterClockwise 15s linear infinite; }
+        .line { position: absolute; top: 50%; left: 50%; width: 300px; height: 2px; background: linear-gradient(90deg, transparent, rgba(0, 113, 227, 0.2), rgba(0, 113, 227, 0.5), rgba(0, 113, 227, 0.2), transparent); transform-origin: left center; border-radius: 2px; }
         .line-1 { transform: rotate(0deg) translateX(-150px); }
         .line-2 { transform: rotate(45deg) translateX(-150px); }
         .line-3 { transform: rotate(90deg) translateX(-150px); }
@@ -203,100 +49,28 @@
         .line-14 { transform: rotate(247.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
         .line-15 { transform: rotate(292.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
         .line-16 { transform: rotate(337.5deg) translateX(-150px); width: 250px; opacity: 0.5; }
-
-        .ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px solid rgba(0, 113, 227, 0.1);
-            border-radius: 50%;
-        }
-
+        .ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 2px solid rgba(0, 113, 227, 0.1); border-radius: 50%; }
         .ring-1 { width: 250px; height: 250px; animation: ringPulse 4s ease-in-out infinite; }
         .ring-2 { width: 320px; height: 320px; border-width: 1px; border-color: rgba(0, 113, 227, 0.05); animation: ringPulse 4s ease-in-out infinite reverse; }
-
-        @keyframes spherePulse {
-            0% { transform: scale(1); box-shadow: 0 0 50px rgba(0, 113, 227, 0.3); }
-            50% { transform: scale(1.2); box-shadow: 0 0 80px rgba(0, 113, 227, 0.5); }
-            100% { transform: scale(1); box-shadow: 0 0 50px rgba(0, 113, 227, 0.3); }
-        }
-
-        @keyframes textGlow {
-            0% { text-shadow: 0 0 20px rgba(0, 113, 227, 0.5); transform: scale(1); }
-            50% { text-shadow: 0 0 40px rgba(0, 113, 227, 0.8); transform: scale(1.1); }
-            100% { text-shadow: 0 0 20px rgba(0, 113, 227, 0.5); transform: scale(1); }
-        }
-
+        @keyframes spherePulse { 0% { transform: scale(1); box-shadow: 0 0 50px rgba(0, 113, 227, 0.3); } 50% { transform: scale(1.2); box-shadow: 0 0 80px rgba(0, 113, 227, 0.5); } 100% { transform: scale(1); box-shadow: 0 0 50px rgba(0, 113, 227, 0.3); } }
+        @keyframes textGlow { 0% { text-shadow: 0 0 20px rgba(0, 113, 227, 0.5); transform: scale(1); } 50% { text-shadow: 0 0 40px rgba(0, 113, 227, 0.8); transform: scale(1.1); } 100% { text-shadow: 0 0 20px rgba(0, 113, 227, 0.5); transform: scale(1); } }
         @keyframes rotateClockwise { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateCounterClockwise { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
-        @keyframes ringPulse {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.6; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-        }
-
-        .features {
-            background: white;
-            padding: 6rem 2rem;
-            position: relative;
-        }
-
-        .features-grid {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4rem;
-            text-align: center;
-        }
-
+        @keyframes ringPulse { 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.6; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } }
+        .features { background: white; padding: 6rem 2rem; position: relative; }
+        .features-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4rem; text-align: center; }
         .feature-icon { font-size: 2.5rem; margin-bottom: 1.5rem; }
         .feature h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
         .feature p { color: #86868b; line-height: 1.6; }
-
-        .categories {
-            max-width: 1280px;
-            margin: 6rem auto;
-            padding: 0 2rem;
-        }
-
+        .categories { max-width: 1280px; margin: 6rem auto; padding: 0 2rem; }
         .section-header { text-align: center; margin-bottom: 3rem; }
-        .section-subtitle { color: #0071e3; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 1rem; display: block; }
         .section-title { font-size: 3rem; font-weight: 600; letter-spacing: -0.02em; color: #1d1c1e; margin-bottom: 1rem; }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .category-card {
-            display: block;
-            background: white;
-            padding: 1.8rem 1rem;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            text-decoration: none;
-            color: inherit;
-        }
-
+        .category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; margin-top: 2rem; }
+        .category-card { display: block; background: white; padding: 1.8rem 1rem; border-radius: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; cursor: pointer; border: 1px solid rgba(0, 0, 0, 0.03); text-decoration: none; color: inherit; }
         .category-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 113, 227, 0.1); border-color: rgba(0, 113, 227, 0.2); }
         .category-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
         .category-card h3 { font-size: 1.2rem; font-weight: 600; }
-
-        .footer {
-            background: #1d1c1e;
-            color: #86868b;
-            padding: 4rem 2rem 2rem;
-            margin-top: 4rem;
-        }
-
+        .footer { background: #1d1c1e; color: #86868b; padding: 4rem 2rem 2rem; margin-top: 4rem; }
         .footer-container { max-width: 1280px; margin: 0 auto; }
         .footer-grid { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 4rem; }
         .footer-col p { margin: 1.5rem 0; line-height: 1.6; }
@@ -306,27 +80,8 @@
         .footer-col ul li a { color: #86868b; text-decoration: none; transition: color 0.3s; font-size: 0.95rem; }
         .footer-col ul li a:hover { color: white; }
         .footer-bottom { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.9rem; }
-
-        @media (max-width: 1024px) {
-            .category-grid { grid-template-columns: repeat(3, 1fr); }
-            .features-grid { grid-template-columns: repeat(2, 1fr); }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero-text h1 { font-size: 2.8rem; }
-            .category-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .category-card { padding: 1.2rem 0.5rem; }
-            .category-icon { font-size: 2rem; }
-            .category-card h3 { font-size: 1rem; }
-            .features-grid { grid-template-columns: 1fr; }
-            .animation-container { width: 300px; height: 300px; }
-            .pulsing-sphere { width: 140px; height: 140px; }
-            .sphere-text { font-size: 1.5rem; }
-            .footer-grid { grid-template-columns: 1fr; text-align: center; }
-            .footer-col ul li a { font-size: 0.9rem; }
-        }
+        @media (max-width: 1024px) { .category-grid { grid-template-columns: repeat(3, 1fr); } .features-grid { grid-template-columns: repeat(2, 1fr); } .footer-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .nav-links { display: none; } .hero-text h1 { font-size: 2.8rem; } .category-grid { grid-template-columns: 1fr; gap: 1rem; } .category-card { padding: 1.2rem 0.5rem; } .category-icon { font-size: 2rem; } .category-card h3 { font-size: 1rem; } .features-grid { grid-template-columns: 1fr; } .animation-container { width: 300px; height: 300px; } .pulsing-sphere { width: 140px; height: 140px; } .sphere-text { font-size: 1.5rem; } .footer-grid { grid-template-columns: 1fr; text-align: center; } }
     </style>
 </head>
 <body>
@@ -334,18 +89,13 @@
 
 <nav class="nav">
     <div class="nav-container">
-        <a href="/" class="logo">iStore</a>
+        <a href="/main" class="logo">iStore</a>
         <div class="nav-links">
-            <a href="/category/iphone">iPhone</a>
-            <a href="/category/mac">Mac</a>
-            <a href="/category/ipad">iPad</a>
-            <a href="/category/airpods">AirPods</a>
-            <a href="/category/accessories">Аксессуары</a>
+            <a th:each="cat : ${categories}" th:href="@{'/category/' + ${cat.slug}}" th:text="${cat.name}">iPhone</a>
         </div>
         <div class="nav-icons">
-            <a href="/search">🔍</a>
             <a href="/cart">🛒</a>
-            <a href="/logout">🚪</a>
+            <a href="/profile">👤</a>
         </div>
     </div>
 </nav>
@@ -356,7 +106,6 @@
             <h1>Технологии будущего</h1>
             <p>Инновации, которые меняют мир вокруг нас</p>
         </div>
-
         <div class="animation-container">
             <div class="ring ring-1"></div>
             <div class="ring ring-2"></div>
@@ -390,12 +139,8 @@
     <div class="section-header">
         <h2 class="section-title">Исследуйте мир Apple</h2>
     </div>
-
-    <!-- Если категории из БД есть — показываем их, иначе статический запасной список -->
     <div class="category-grid" th:unless="${#lists.isEmpty(categories)}">
-        <a th:each="category : ${categories}"
-           th:href="@{'/category/' + ${category.slug}}"
-           class="category-card">
+        <a th:each="category : ${categories}" th:href="@{'/category/' + ${category.slug}}" class="category-card">
             <div class="category-icon" th:switch="${category.name}">
                 <span th:case="'iPhone'">📱</span>
                 <span th:case="'Mac'">💻</span>
@@ -408,78 +153,24 @@
             <h3 th:text="${category.name}">iPhone</h3>
         </a>
     </div>
-
-    <!-- Запасной статический список, чтобы категории всегда были видны -->
-    <div class="category-grid" th:if="${#lists.isEmpty(categories)}">
-        <a href="/category/iphone" class="category-card">
-            <div class="category-icon">📱</div>
-            <h3>iPhone</h3>
-        </a>
-        <a href="/category/mac" class="category-card">
-            <div class="category-icon">💻</div>
-            <h3>Mac</h3>
-        </a>
-        <a href="/category/ipad" class="category-card">
-            <div class="category-icon">📱</div>
-            <h3>iPad</h3>
-        </a>
-        <a href="/category/airpods" class="category-card">
-            <div class="category-icon">🎧</div>
-            <h3>AirPods</h3>
-        </a>
-        <a href="/category/accessories" class="category-card">
-            <div class="category-icon">🔌</div>
-            <h3>Аксессуары</h3>
-        </a>
-    </div>
 </section>
 
 <section class="features">
     <div class="features-grid">
-        <div class="feature">
-            <div class="feature-icon">🚚</div>
-            <h3>Бесплатная доставка</h3>
-            <p>При заказе от 1 000 BYN</p>
-        </div>
-        <div class="feature">
-            <div class="feature-icon">🛡️</div>
-            <h3>2 года гарантии</h3>
-            <p>Официальная гарантия</p>
-        </div>
-        <div class="feature">
-            <div class="feature-icon">💳</div>
-            <h3>Рассрочка 0-0-6</h3>
-            <p>Без переплат</p>
-        </div>
+        <div class="feature"><div class="feature-icon">🚚</div><h3>Бесплатная доставка</h3><p>При заказе от 1 000 BYN</p></div>
+        <div class="feature"><div class="feature-icon">🛡️</div><h3>2 года гарантии</h3><p>Официальная гарантия</p></div>
+        <div class="feature"><div class="feature-icon">💳</div><h3>Рассрочка 0-0-6</h3><p>Без переплат</p></div>
     </div>
 </section>
 
 <footer class="footer">
     <div class="footer-container">
         <div class="footer-grid">
-            <div class="footer-col">
-                <h3 style="color: white; font-size: 1.5rem;">iStore</h3>
-                <p>Превосходство в деталях. Официальный дилер Apple.</p>
-            </div>
-            <div class="footer-col">
-                <ul>
-                    <li th:each="category : ${categories}">
-                        <a th:href="@{'/category/' + ${category.slug}}" th:text="${category.name}">iPhone</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Контакты</h4>
-                <ul>
-                    <li><a href="tel:+375291234567">+375 (29) 123-45-67</a></li>
-                    <li><a href="mailto:info@istore.by">info@istore.by</a></li>
-                    <li>Минск, пр. Независимости, 10</li>
-                </ul>
-            </div>
+            <div class="footer-col"><h3 style="color: white; font-size: 1.5rem;">iStore</h3><p>Превосходство в деталях. Официальный дилер Apple.</p></div>
+            <div class="footer-col"><ul><li th:each="category : ${categories}"><a th:href="@{'/category/' + ${category.slug}}" th:text="${category.name}">iPhone</a></li></ul></div>
+            <div class="footer-col"><h4>Контакты</h4><ul><li><a href="tel:+375291234567">+375 (29) 123-45-67</a></li><li><a href="mailto:info@istore.by">info@istore.by</a></li><li>Минск, пр. Независимости, 10</li></ul></div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2026 iStore. Все права защищены.</p>
-        </div>
+        <div class="footer-bottom"><p>© 2026 iStore. Все права защищены.</p></div>
     </div>
 </footer>
 

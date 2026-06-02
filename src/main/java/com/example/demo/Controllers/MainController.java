@@ -15,16 +15,15 @@ public class MainController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/main";
+    }
+
     @GetMapping("/main")
-    public String home(Model model) {
-        List<Category> categories = categoryRepository.findAll();
+    public String mainPage(Model model) {
+        List<Category> categories = categoryRepository.findAllByOrderByNameAsc();
         model.addAttribute("categories", categories);
         return "index";
     }
-
-    @GetMapping("/login")
-    public String loginForm() {
-        return "login";
-    }
-
 }

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Товары | Админ-панель</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; }
+        body { background: #f5f5f7; }
+        .nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo { font-size: 1.5rem; font-weight: 600; text-decoration: none; color: #0071e3; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: #1d1c1e; text-decoration: none; opacity: 0.7; }
+        .nav-links a.active { opacity: 1; color: #0071e3; }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { background: none; border: none; color: #ff3b30; cursor: pointer; }
+        .container { max-width: 1280px; margin: 2rem auto; padding: 0 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .page-title { font-size: 2rem; font-weight: 700; }
+        .btn-add { background: #0071e3; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .search-box { display: flex; gap: 0.5rem; }
+        .search-input { padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 40px; width: 250px; font-size: 0.9rem; }
+        .search-btn { background: #0071e3; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; }
+        .reset-filters { background: #f0f0f0; color: #333; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; text-decoration: none; }
+        .sort-select { padding: 0.6rem 1rem; border-radius: 40px; border: 1px solid #ddd; background: white; cursor: pointer; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; }
+        .product-image { width: 100%; height: 180px; object-fit: cover; background: #f0f0f0; }
+        .product-info { padding: 1rem; }
+        .product-name { font-weight: 600; margin-bottom: 0.5rem; }
+        .product-price { color: #0071e3; font-weight: 600; }
+        .product-stock { font-size: 0.8rem; color: #666; margin-top: 0.3rem; }
+        .product-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .btn-edit { flex: 1; background: #f0f0f0; color: #333; text-align: center; padding: 0.4rem; border-radius: 6px; text-decoration: none; }
+        .btn-delete { flex: 1; background: #fee2e2; color: #ff3b30; border: none; padding: 0.4rem; border-radius: 6px; cursor: pointer; }
+        .flash-message { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+        .flash-success { background: #e6f7e6; color: #10b981; }
+        .flash-error { background: #fee2e2; color: #ef4444; }
+        .empty-products { text-align: center; padding: 3rem; background: white; border-radius: 16px; color: #86868b; }
+        .search-info { background: #e6f7e6; padding: 0.5rem 1rem; border-radius: 40px; font-size: 0.8rem; color: #10b981; margin-bottom: 1rem; }
+        .main-badge { position: absolute; top: 10px; left: 10px; background: #0071e3; color: white; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/admin" class="logo">iStore Admin</a>
+        <div class="nav-links">
+            <a href="/admin">Дашборд</a>
+            <a href="/admin/products" class="active">Товары</a>
+            <a href="/admin/orders">Заказы</a>
+            <a href="/admin/categories">Категории</a>
+        </div>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}">admin</span>
+            <form action="/logout" method="post">
+                <button type="submit" class="logout-btn">Выйти</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Управление товарами</h1>
+        <a href="/admin/products/add" class="btn-add">+ Добавить товар</a>
+    </div>
+
+    <div th:if="${message}" class="flash-message flash-success" th:text="${message}"></div>
+    <div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
+
+    <div class="toolbar">
+        <form method="get" action="/admin/products" class="search-box">
+            <input type="text" name="search" class="search-input" placeholder="Поиск по названию..." th:value="${searchQuery}">
+            <button type="submit" class="search-btn">Найти</button>
+            <a th:href="@{/admin/products}" class="reset-filters">Сбросить</a>
+        </form>
+
+        <div>
+            <select id="sortSelect" class="sort-select">
+                <option value="default" th:selected="${currentSort == null or currentSort == 'default'}">Без сортировки</option>
+                <option value="name_asc" th:selected="${currentSort == 'name_asc'}">По названию (А-Я)</option>
+                <option value="name_desc" th:selected="${currentSort == 'name_desc'}">По названию (Я-А)</option>
+                <option value="price_asc" th:selected="${currentSort == 'price_asc'}">По цене (возр.)</option>
+                <option value="price_desc" th:selected="${currentSort == 'price_desc'}">По цене (убыв.)</option>
+            </select>
+        </div>
+    </div>
+
+    <div th:if="${searchQuery}" class="search-info">
+        Результаты поиска по запросу: "<strong th:text="${searchQuery}"></strong>"
+    </div>
+
+    <div th:if="${products.empty}" class="empty-products">
+        <p>Товаров не найдено</p>
+        <a href="/admin/products/add" style="color: #0071e3;">Добавить товар →</a>
+    </div>
+
+    <div class="product-grid" th:unless="${products.empty}">
+        <div th:each="product : ${products}" class="product-card">
+            <span th:if="${product.images != null and !product.images.isEmpty() and product.images[0].main}" class="main-badge">Главное</span>
+            <img th:if="${product.images != null and !product.images.isEmpty()}" th:src="${product.images[0].imageUrl}" class="product-image">
+            <img th:if="${product.images == null or product.images.isEmpty()}" src="/images/no-image.png" class="product-image">
+            <div class="product-info">
+                <div class="product-name" th:text="${product.name}">Товар</div>
+                <div class="product-price" th:text="${product.price} + ' руб.'">0 руб.</div>
+                <div class="product-stock" th:text="'В наличии: ' + ${product.stockQuantity} + ' шт.'">В наличии</div>
+                <div class="product-actions">
+                    <a th:href="@{/admin/products/edit/{id}(id=${product.id})}" class="btn-edit">Редактировать</a>
+                    <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post" style="margin:0; flex:1">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Удалить товар?')">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            const url = new URL(window.location.href);
+            if (this.value === 'default') {
+                url.searchParams.delete('sort');
+            } else {
+                url.searchParams.set('sort', this.value);
+            }
+            window.location.href = url.toString();
+        });
+    }
+
+    setTimeout(() => {
+        const flash = document.querySelector('.flash-message');
+        if (flash) flash.style.display = 'none';
+    }, 3000);
+</script>
+</body>
+</html>

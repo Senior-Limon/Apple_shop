@@ -6,10 +6,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     @Autowired
@@ -20,29 +22,34 @@ public class SecurityConfig {
         http
                 .userDetailsService(userService)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/login", "/register").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/main", "/login", "/register").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/product/**").permitAll()
+                        .requestMatchers("/category/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .usernameParameter("username")
+                        .usernameParameter("phone")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/main", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout=true")
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("JSESSIONID", "remember-me")
                         .invalidateHttpSession(true)
                         .permitAll()
                 )
                 .rememberMe(remember -> remember
-                        .key("uniqueAndSecret")
-                        .tokenValiditySeconds(604800)
+                        .key("uniqueAndSecretKeyForRememberMe")
+                        .tokenValiditySeconds(604800)  // 7 дней
                         .rememberMeParameter("remember-me")
+                        .userDetailsService(userService)
                 )
                 .csrf(csrf -> csrf.disable());
 

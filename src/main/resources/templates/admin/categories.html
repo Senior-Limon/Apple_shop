@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Категории | Админ-панель</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; }
+        body { background: #f5f5f7; }
+        .nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo { font-size: 1.5rem; font-weight: 600; text-decoration: none; color: #0071e3; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: #1d1c1e; text-decoration: none; opacity: 0.7; }
+        .nav-links a.active { opacity: 1; color: #0071e3; }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { background: none; border: none; color: #ff3b30; cursor: pointer; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .page-title { font-size: 2rem; font-weight: 700; }
+        .btn-add { background: #0071e3; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; }
+        .categories-table { width: 100%; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th { text-align: left; padding: 1rem; background: #f8f8fc; font-weight: 600; }
+        td { padding: 1rem; border-bottom: 1px solid #f0f0f0; }
+        .btn-delete { background: #fee2e2; color: #ff3b30; border: none; padding: 0.3rem 0.8rem; border-radius: 6px; cursor: pointer; }
+        .btn-edit { background: #e6f7e6; color: #10b981; border: none; padding: 0.3rem 0.8rem; border-radius: 6px; cursor: pointer; margin-right: 0.5rem; text-decoration: none; display: inline-block; }
+        .flash-message { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+        .flash-success { background: #e6f7e6; color: #10b981; }
+        .flash-error { background: #fee2e2; color: #ef4444; }
+        .empty-message { text-align: center; padding: 3rem; color: #86868b; }
+        .action-buttons { display: flex; gap: 0.5rem; align-items: center; }
+        @media (max-width: 768px) { .nav-links { display: none; } .categories-table { display: block; overflow-x: auto; } }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/admin" class="logo">iStore Admin</a>
+        <div class="nav-links">
+            <a href="/admin">Дашборд</a>
+            <a href="/admin/products">Товары</a>
+            <a href="/admin/orders">Заказы</a>
+            <a href="/admin/categories" class="active">Категории</a>
+        </div>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}">admin</span>
+            <form action="/logout" method="post">
+                <button type="submit" class="logout-btn">Выйти</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Управление категориями</h1>
+        <a href="/admin/categories/add" class="btn-add">+ Добавить категорию</a>
+    </div>
+
+    <div th:if="${message}" class="flash-message flash-success" th:text="${message}"></div>
+    <div th:if="${error}" class="flash-message flash-error" th:text="${error}"></div>
+
+    <div th:if="${categories.empty}" class="empty-message">
+        <p>Категорий пока нет</p>
+        <a href="/admin/categories/add" style="color: #0071e3;">Добавить первую категорию →</a>
+    </div>
+
+    <div th:unless="${categories.empty}">
+        <table class="categories-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Slug</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cat : ${categories}">
+                <td th:text="${cat.id}">1</td>
+                <td th:text="${cat.name}">iPhone</td>
+                <td th:text="${cat.slug}">iphone</td>
+                <td class="action-buttons">
+                    <a th:href="@{/admin/categories/edit/{id}(id=${cat.id})}" class="btn-edit">Редактировать</a>
+                    <form th:action="@{/admin/categories/delete/{id}(id=${cat.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Удалить категорию?')">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        const flash = document.querySelector('.flash-message');
+        if (flash) flash.style.display = 'none';
+    }, 3000);
+</script>
+</body>
+</html>
